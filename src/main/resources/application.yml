@@ -1,0 +1,36 @@
+#Application Server Port
+server:
+  port: 8081
+
+#Application Server Name
+spring:
+  application:
+    name: e-school
+
+  jackson:
+    time-zone: Asia/Dhaka
+
+
+  #Application Database Setup
+  datasource:
+    url: jdbc:postgresql://172.17.0.2:5432/e_school
+    username: postgres
+    password: root
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+        #dialect: org.hibernate.dialect.MySQL8Dialect
+        #generate_statistics: true
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+#OpenAPI Swagger-UI Custom Path
+springdoc:
+  swagger-ui:
+    path: /documentation
+
