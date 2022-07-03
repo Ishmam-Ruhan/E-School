@@ -58,18 +58,7 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return getUserId().equals(user.getUserId()) && getEmail().equals(user.getEmail()) && getPhone().equals(user.getPhone());
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getUserId(), getEmail(), getPhone());
-    }
 
     public String getUserId() {
         return userId;

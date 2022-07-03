@@ -22,11 +22,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL9Dialect
         #dialect: org.hibernate.dialect.MySQL8Dialect
         #generate_statistics: true
+        enable_lazy_load_no_trans: true                     # To avoid "failed to lazily initialize a collection of role could not initialize proxy - no session" error
         jdbc:
           batch_size: 50
           order_inserts: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
 
 #OpenAPI Swagger-UI Custom Path

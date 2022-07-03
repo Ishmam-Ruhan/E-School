@@ -32,10 +32,8 @@ public class AppInitialization {
         user.setPhone("0987654321");
         user.setRole(Role.STUDENT);
 
-        UserDescription userDescription = new UserDescription();
+        UserDescription userDescription = new UserDescription(user);
         userDescription.setName("Ishmam");
-        userDescription.setRole(user.getRole());
-        userDescription.setUser(user);
 
         user.setUserDescription(userDescription);
 
