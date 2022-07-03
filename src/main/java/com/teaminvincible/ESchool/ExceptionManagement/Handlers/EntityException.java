@@ -1,7 +1,7 @@
 package com.teaminvincible.ESchool.ExceptionManagement.Handlers;
 
-import com.ishmamruhan.DislAssignmentOne.Output.ErrorField;
-import com.ishmamruhan.DislAssignmentOne.Output.Response;
+import com.teaminvincible.ESchool.Output.ErrorField;
+import com.teaminvincible.ESchool.Output.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
