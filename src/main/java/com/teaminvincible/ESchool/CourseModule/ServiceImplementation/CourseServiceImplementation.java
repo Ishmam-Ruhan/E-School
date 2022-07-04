@@ -17,7 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -58,7 +57,7 @@ public class CourseServiceImplementation implements CourseService {
         UserDescription userDescription = userDescriptionRepository.findByuserId(userId).orElse(null);
 
         course.setCourseOwner(userDescription);
-        
+
         System.out.println("Course Controller: Create Course: "+course);
 
         try{
