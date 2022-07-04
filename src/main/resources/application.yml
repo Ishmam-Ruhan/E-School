@@ -10,6 +10,8 @@ spring:
   jackson:
     time-zone: Asia/Dhaka
 
+  main:
+    allow-circular-references: true   # Some beans is depended upon another bean. By setting up this dependency, no compiler error will occur regarding this.
 
   #Application Database Setup
   datasource:

@@ -19,12 +19,16 @@ import java.util.Set;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "courses")
+@JsonIgnoreProperties(value = {"courseJoiningCode","createdDate"}, allowGetters = true)
 public class Course implements Serializable {
     @Id
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
     @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
     private String courseId;
+
+    @Column(nullable = false, unique = true)
+    private String courseJoiningCode;
 
     private String courseTitle;
 
@@ -62,8 +66,9 @@ public class Course implements Serializable {
     public Course() {
     }
 
-    public Course(String courseId, String courseTitle, String courseSubTitle, UserDescription courseOwner, Set<UserDescription> students, Set<Task> tasks, Set<Meeting> meetings, Boolean isClosed, Date createdDate) {
+    public Course(String courseId, String courseJoiningCode, String courseTitle, String courseSubTitle, UserDescription courseOwner, Set<UserDescription> students, Set<Task> tasks, Set<Meeting> meetings, Boolean isClosed, Date createdDate) {
         this.courseId = courseId;
+        this.courseJoiningCode = courseJoiningCode;
         this.courseTitle = courseTitle;
         this.courseSubTitle = courseSubTitle;
         this.courseOwner = courseOwner;
@@ -93,6 +98,14 @@ public class Course implements Serializable {
 
     public void setCourseId(String courseId) {
         this.courseId = courseId;
+    }
+
+    public String getCourseJoiningCode() {
+        return courseJoiningCode;
+    }
+
+    public void setCourseJoiningCode(String courseJoiningCode) {
+        this.courseJoiningCode = courseJoiningCode;
     }
 
     public String getCourseTitle() {
@@ -159,18 +172,18 @@ public class Course implements Serializable {
         this.createdDate = createdDate;
     }
 
-    @Override
-    public String toString() {
-        return "Course{" +
-                "courseId='" + courseId + '\'' +
-                ", courseTitle='" + courseTitle + '\'' +
-                ", courseSubTitle='" + courseSubTitle + '\'' +
-                ", courseOwner=" + courseOwner +
-                ", students=" + students +
-                ", tasks=" + tasks +
-                ", meetings=" + meetings +
-                ", isClosed=" + isClosed +
-                ", createdDate=" + createdDate +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Course{" +
+//                "courseId='" + courseId + '\'' +
+//                ", courseTitle='" + courseTitle + '\'' +
+//                ", courseSubTitle='" + courseSubTitle + '\'' +
+//                ", courseOwner=" + courseOwner +
+//                ", students=" + students +
+//                ", tasks=" + tasks +
+//                ", meetings=" + meetings +
+//                ", isClosed=" + isClosed +
+//                ", createdDate=" + createdDate +
+//                '}';
+//    }
 }
