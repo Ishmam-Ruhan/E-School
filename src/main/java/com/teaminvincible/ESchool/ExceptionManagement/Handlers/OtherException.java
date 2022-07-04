@@ -26,25 +26,25 @@ public class OtherException {
                 ));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handle(Exception ex,
-                                         HttpServletRequest request, HttpServletResponse response) {
-        if (ex instanceof NullPointerException) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new Response<>(
-                            HttpStatus.BAD_REQUEST,
-                            false,
-                            ex.getMessage()
-                    ));
-        }
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new Response<>(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        false,
-                        ex.getMessage()
-                ));
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Object> handle(Exception ex,
+//                                         HttpServletRequest request, HttpServletResponse response) {
+//        if (ex instanceof NullPointerException) {
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body(new Response<>(
+//                            HttpStatus.BAD_REQUEST,
+//                            false,
+//                            ex.getMessage()
+//                    ));
+//        }
+//        return ResponseEntity
+//                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(new Response<>(
+//                        HttpStatus.INTERNAL_SERVER_ERROR,
+//                        false,
+//                        ex.getMessage()
+//                ));
+//    }
 
 }

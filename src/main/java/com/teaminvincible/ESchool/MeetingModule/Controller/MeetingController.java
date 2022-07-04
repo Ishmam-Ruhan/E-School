@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,7 +27,7 @@ public class MeetingController {
             summary = "Create a meeting"
     )
     @PostAPI("/create-meeting")
-    public ResponseEntity createMeeting(Meeting meeting){
+    public ResponseEntity createMeeting(@RequestBody Meeting meeting){
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new Response(
@@ -45,7 +42,7 @@ public class MeetingController {
             summary = "Update a meeting"
     )
     @PutAPI("/update-meeting")
-    public ResponseEntity updateMeeting(Meeting meeting){
+    public ResponseEntity updateMeeting(@RequestBody Meeting meeting){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new Response(
@@ -60,7 +57,7 @@ public class MeetingController {
             summary = "Delete a meeting"
     )
     @DeleteAPI("/delete-meeting")
-    public ResponseEntity deleteMeeting(String meetingId){
+    public ResponseEntity deleteMeeting(@RequestParam String meetingId){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new Response(
