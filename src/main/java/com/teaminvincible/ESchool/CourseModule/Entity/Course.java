@@ -27,7 +27,7 @@ public class Course implements Serializable {
     @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
     private String courseId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String courseJoiningCode;
 
     private String courseTitle;
@@ -172,18 +172,18 @@ public class Course implements Serializable {
         this.createdDate = createdDate;
     }
 
-    @Override
-    public String toString() {
-        return "Course{" +
-                "courseId='" + courseId + '\'' +
-                ", courseTitle='" + courseTitle + '\'' +
-                ", courseSubTitle='" + courseSubTitle + '\'' +
-                ", courseOwner=" + courseOwner +
-                ", students=" + students +
-                ", tasks=" + tasks +
-                ", meetings=" + meetings +
-                ", isClosed=" + isClosed +
-                ", createdDate=" + createdDate +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Course{" +
+//                "courseId='" + courseId + '\'' +
+//                ", courseTitle='" + courseTitle + '\'' +
+//                ", courseSubTitle='" + courseSubTitle + '\'' +
+//                ", courseOwner=" + courseOwner +
+//                ", students=" + students +
+//                ", tasks=" + tasks +
+//                ", meetings=" + meetings +
+//                ", isClosed=" + isClosed +
+//                ", createdDate=" + createdDate +
+//                '}';
+//    }
 }

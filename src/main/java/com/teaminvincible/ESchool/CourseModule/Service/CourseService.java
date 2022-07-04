@@ -10,7 +10,16 @@ import java.util.Set;
 @Service
 public interface CourseService {
 
+    /**
+     *  Join course by course Id service and api
+     */
+
+
     Course createCourse(String userId, Course course) throws CustomException;
+
+    Course joinCourse(String userId, String joiningCode) throws CustomException;
+
+    String unEnrollFromACourse(String userId, String courseId) throws CustomException;
 
     Course updateCourse(String userId, Course course) throws CustomException;
 

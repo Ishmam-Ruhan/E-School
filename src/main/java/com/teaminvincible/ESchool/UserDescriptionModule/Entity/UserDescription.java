@@ -1,6 +1,7 @@
 package com.teaminvincible.ESchool.UserDescriptionModule.Entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.Enums.Role;
@@ -11,7 +12,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class UserDescription implements Serializable {
 
     @OneToOne
     @MapsId
-    @JsonIgnoreProperties(value = {"userDescription"})
+    @JsonIgnore
     private User user;
 
     /**
@@ -41,7 +41,7 @@ public class UserDescription implements Serializable {
      */
 
 
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.DETACH})
     @JoinTable(
             name = "user_course",
             joinColumns = {
@@ -86,7 +86,7 @@ public class UserDescription implements Serializable {
 
     public UserDescription(User user) {
         this.user = user;
-        this.setRole();
+        this.setRole(user.getRole());
     }
 
     public UserDescription(String userId, String name, Role role, User user, Set<Course> courses, Set<Task> tasks, Set<Meeting> meetings) {
@@ -132,8 +132,8 @@ public class UserDescription implements Serializable {
         return role;
     }
 
-    public void setRole() {
-        this.role = this.user.getRole();
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public User getUser() {
@@ -168,6 +168,10 @@ public class UserDescription implements Serializable {
         this.meetings = meetings;
     }
 
+    public void removeCourse(Course course){
+        this.courses.remove(course);
+        course.getStudents().remove(this);
+    }
 
 
     @Override

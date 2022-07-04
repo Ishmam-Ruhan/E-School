@@ -17,7 +17,7 @@ public final class CourseSpecification {
         };
     }
 
-    public static Specification<Course> findCourseByStudent(String userId){
+    public static Specification<Course> findCourseByEnrolledStudentId(String userId){
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.equal(root.join("students").get("userId"), userId);
         };

@@ -50,6 +50,34 @@ public class CourseController {
     }
 
     @Operation(
+            summary = "Enroll a course."
+    )
+    @PutAPI("/join-course/code/{joiningCode}/user/{userId}")
+    public ResponseEntity joinCourseByJoiningCode(@PathVariable String joiningCode, @PathVariable String userId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response<>(
+                        HttpStatus.OK,
+                        true,
+                        "Joined Course successfully.",
+                        courseService.joinCourse(userId,joiningCode)
+                ));
+    }
+
+    @Operation(
+            summary = "Un-Enroll from a course."
+    )
+    @PutAPI("/remove-course/course/{courseId}/user/{userId}")
+    public ResponseEntity unEnrollCourse(@PathVariable String courseId, @PathVariable String userId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response<>(
+                        HttpStatus.OK,
+                        true,
+                        "Un-Enrolled Course successfully.",
+                        courseService.unEnrollFromACourse(userId,courseId)
+                ));
+    }
+
+    @Operation(
             summary = "Delete a course."
     )
     @DeleteAPI("/delete-course/user/{userId}/course/{courseId}")

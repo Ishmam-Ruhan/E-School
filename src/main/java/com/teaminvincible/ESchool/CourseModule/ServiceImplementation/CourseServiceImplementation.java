@@ -5,11 +5,11 @@ import com.teaminvincible.ESchool.CourseModule.DTO.CourseSpecification;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.CourseModule.Repository.CourseRepository;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
+import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
-import com.teaminvincible.ESchool.UserDescriptionModule.Repository.UserDescriptionRepository;
+import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
 import com.teaminvincible.ESchool.Utility.CodeGenerator;
-import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -17,6 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,7 +29,8 @@ public class CourseServiceImplementation implements CourseService {
     private CourseRepository courseRepository;
 
     @Autowired
-    private UserDescriptionRepository userDescriptionRepository;
+    private UserDescriptionService userDescriptionService;
+
 
     public Course findCourseById(String userID, String courseId) throws CustomException{
 
@@ -42,6 +45,13 @@ public class CourseServiceImplementation implements CourseService {
         throw new CustomException(HttpStatus.NOT_FOUND,"No course found with id: "+courseId);
     }
 
+    public Course findCourseById(String courseId) throws CustomException{
+
+        Optional<Course> course = courseRepository.findById(courseId);
+
+        if(course.isPresent())return course.get();
+        throw new CustomException(HttpStatus.NOT_FOUND,"No course found with id: "+courseId);
+    }
 
     @Override
     public Course createCourse(String userId, Course course) throws CustomException {
@@ -54,11 +64,12 @@ public class CourseServiceImplementation implements CourseService {
         if(course.getCourseJoiningCode() == null)
             course.setCourseJoiningCode(CodeGenerator.generateCourseJoinCode());
 
-        UserDescription userDescription = userDescriptionRepository.findByuserId(userId).orElse(null);
+        UserDescription userDescription = userDescriptionService.getUserDescription(userId);
+
+        if(userDescription.getRole() == Role.STUDENT)
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a course! They can only join.");
 
         course.setCourseOwner(userDescription);
-
-        System.out.println("Course Controller: Create Course: "+course);
 
         try{
             course1 = courseRepository.save(course);
@@ -67,6 +78,53 @@ public class CourseServiceImplementation implements CourseService {
         }
 
         return course1;
+    }
+
+    @Override
+    public Course joinCourse(String userId, String joiningCode) throws CustomException {
+        UserDescription userDescription = userDescriptionService.getUserDescription(userId);
+
+        System.out.println("User Role: "+userDescription.getRole());
+
+        if(userDescription.getRole() == Role.TEACHER)
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Teachers are not allowed to join a course! They can only create course.");
+
+        Course course = courseRepository.findBycourseJoiningCode(joiningCode);
+
+        System.out.println("User Role: "+userDescription.getRole());
+
+
+        if(course == null)
+            throw new CustomException(HttpStatus.BAD_REQUEST,"No course found! Please provide a valid course joining code.");
+
+        // Check user exist in this course or not
+
+        Set<Course> courses = userDescription.getCourses();
+        courses.add(course);
+
+        userDescription.setCourses(courses);
+
+        System.out.println("User Role: "+userDescription.getRole());
+
+
+        userDescriptionService.updateUserDescription(userDescription);
+
+        return course;
+    }
+
+    @Override
+    public String unEnrollFromACourse(String userId, String courseId) throws CustomException {
+
+        Course courseToRemove= findCourseById(courseId);
+
+        UserDescription userDescription = userDescriptionService.getUserDescription(userId);
+
+        userDescription.removeCourse(courseToRemove);
+
+        userDescriptionService.updateUserDescription(userDescription);
+
+
+        return "Successfully un-enrolled from course: "+courseToRemove.getCourseTitle();
     }
 
     @Override
@@ -84,7 +142,6 @@ public class CourseServiceImplementation implements CourseService {
 
     @Override
     public String deleteCourse(String userId, String courseId) throws CustomException {
-        Course course = findCourseById(userId, courseId);
 
         try{
             courseRepository.deleteById(courseId);
@@ -98,10 +155,10 @@ public class CourseServiceImplementation implements CourseService {
     @Override
     public Set<Course> getAllCourseOfAUser(String userId) throws CustomException {
 
-        Specification<Course> spec = Specification.where(CourseSpecification.findCourseByCourseOwner(userId)
-                .or(CourseSpecification.findCourseByStudent(userId)));
+        Set<Course> courseSet = new HashSet<>();
+        courseSet.addAll( courseRepository.findAll(CourseSpecification.findCourseByCourseOwner(userId)));
 
-        return (Set<Course>) courseRepository.findAll(spec);
+        return courseSet;
     }
 
     @Override

@@ -4,16 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
-
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")

@@ -2,7 +2,9 @@ package com.teaminvincible.ESchool.ExceptionManagement;
 
 import org.springframework.http.HttpStatus;
 
-public class CustomException extends RuntimeException{
+import java.util.function.Supplier;
+
+public class CustomException extends RuntimeException {
     private HttpStatus httpStatus;
     private String exceptionMessage;
 
