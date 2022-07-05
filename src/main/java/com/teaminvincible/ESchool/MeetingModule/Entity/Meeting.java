@@ -68,6 +68,20 @@ public class Meeting implements Serializable {
         this.createdAt = createdAt;
     }
 
+    @PreRemove
+    public void beforeRemovingEntity(){
+        this.users.forEach(userDescription -> {
+            userDescription.removeMeetingFromUser(this);
+        });
+        this.createdBy  = null;
+        this.course = null;
+    }
+
+    public void removeUserFromMeeting(UserDescription userDescription){
+        this.users.remove(userDescription);
+        userDescription.getMeetings().remove(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -152,6 +166,7 @@ public class Meeting implements Serializable {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+
 
     @Override
     public String toString() {

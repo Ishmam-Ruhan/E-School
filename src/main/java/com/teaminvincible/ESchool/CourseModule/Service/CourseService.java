@@ -25,7 +25,7 @@ public interface CourseService {
 
     String deleteCourse(String userId, String courseId) throws CustomException;
 
-    Set<Course> getAllCourseOfAUser(String userId) throws CustomException;
+    Set<Course> getAllCourseOfATeacher(String userId) throws CustomException;
 
     Set<Course> findCourse(String userId, CourseSearchCriteria searchCriteria) throws CustomException;
 }
