@@ -4,6 +4,7 @@ import com.teaminvincible.ESchool.AuthModule.DTO.CreateUserRequest;
 import com.teaminvincible.ESchool.AuthModule.DTO.SignInRequest;
 import com.teaminvincible.ESchool.AuthModule.Service.AuthService;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.Security.JWT.JwtGenerator;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserModule.Entity.User;
 import com.teaminvincible.ESchool.UserModule.Service.UserService;
@@ -14,6 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,12 @@ public class AuthServiceImplementation implements AuthService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtGenerator jwtGenerator;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -71,6 +80,13 @@ public class AuthServiceImplementation implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return "Successfully signed in.";
+        UserDetails userDetails = userDetailsService.loadUserByUsername(signInRequest.getEmail());
+
+        String jwt = jwtGenerator.generateToken(userDetails);
+
+        if(jwt == null)
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Something went wrong! Please try again.");
+
+        return jwt;
     }
 }

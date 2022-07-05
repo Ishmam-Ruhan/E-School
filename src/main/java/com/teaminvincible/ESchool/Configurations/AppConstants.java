@@ -1,6 +1,10 @@
 package com.teaminvincible.ESchool.Configurations;
 
+
 public class AppConstants {
+
+    public static final String JWT_SECRET = "e_school_javafest";
+    public static final long JWT_Expiration = 1296000;
 
     public static String[] UNAUTHORIZED_GETWAYS(){
 
