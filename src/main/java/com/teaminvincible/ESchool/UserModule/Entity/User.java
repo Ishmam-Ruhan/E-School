@@ -17,7 +17,7 @@ public class User implements Serializable {
     @Id
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-    @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
+    @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false, unique = true)
     private String userId;
 
     @Column(name = "email", nullable = false)
@@ -55,6 +55,10 @@ public class User implements Serializable {
         this.role = role;
     }
 
+    @PreRemove
+    public void beforeRemovingObject(){
+        userDescription = null;
+    }
 
 
     public String getUserId() {

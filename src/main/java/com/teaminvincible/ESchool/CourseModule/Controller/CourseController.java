@@ -94,14 +94,14 @@ public class CourseController {
     @Operation(
             summary = "Get all courses of a user"
     )
-    @GetAPI("/get-course/user/{userId}")
-    public ResponseEntity getAllCourseOfAUser(@PathVariable String userId){
+    @GetAPI("/get-course/user/role/teacher/{teacherId}")
+    public ResponseEntity getAllCourseOfATeacher(@PathVariable String teacherId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "All courses of user with id: "+userId+" fetched successfully!",
-                        courseService.getAllCourseOfAUser(userId)
+                        "All courses of user with id: "+teacherId+" fetched successfully!",
+                        courseService.getAllCourseOfATeacher(teacherId)
                 ));
     }
 

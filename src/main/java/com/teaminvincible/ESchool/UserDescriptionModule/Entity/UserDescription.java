@@ -99,6 +99,14 @@ public class UserDescription implements Serializable {
         this.meetings = meetings;
     }
 
+    @PreRemove
+    public void beforeRemovingEntity(){
+        this.user = null;
+        this.courses = new HashSet<>();
+        this.tasks = new HashSet<>();
+        this.meetings = new HashSet<>();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,6 +181,14 @@ public class UserDescription implements Serializable {
         course.getStudents().remove(this);
     }
 
+    public void removeMeetingFromUser(Meeting meeting){
+        this.meetings.remove(meeting);
+        meeting.getUsers().remove(this);
+    }
+
+    public Boolean checkIfUserAlreadyEnrolledThisCourse(Course course){
+        return this.getCourses().contains(course);
+    }
 
     @Override
     public String toString() {

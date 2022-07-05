@@ -79,6 +79,31 @@ public class Course implements Serializable {
         this.createdDate = createdDate;
     }
 
+    @PreRemove
+    public void beforeRemovingEntity(){
+        this.courseOwner = null;
+        this.students.forEach(student -> {
+            student.removeCourse(this);
+        });
+//        this.tasks.forEach(task -> {
+//            task.removeCourse(this);
+//        });
+        this.meetings = new HashSet<>();
+    }
+
+    public void removeUserDescription(UserDescription userDescription){
+        this.students.remove(userDescription);
+        userDescription.getCourses().remove(this);
+    }
+
+    public void removeTasks(Task task){
+        this.tasks.remove(task);
+    }
+
+    public void removeMeetings(Meeting meeting){
+        this.meetings.remove(meeting);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -172,18 +197,4 @@ public class Course implements Serializable {
         this.createdDate = createdDate;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Course{" +
-//                "courseId='" + courseId + '\'' +
-//                ", courseTitle='" + courseTitle + '\'' +
-//                ", courseSubTitle='" + courseSubTitle + '\'' +
-//                ", courseOwner=" + courseOwner +
-//                ", students=" + students +
-//                ", tasks=" + tasks +
-//                ", meetings=" + meetings +
-//                ", isClosed=" + isClosed +
-//                ", createdDate=" + createdDate +
-//                '}';
-//    }
 }

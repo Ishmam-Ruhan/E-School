@@ -68,7 +68,7 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
 
         if(userDescription.getRole().equals(Role.STUDENT))return userDescription.getCourses();
 
-        return courseService.getAllCourseOfAUser(userId);
+        return courseService.getAllCourseOfATeacher(userId);
     }
 
     @Override
