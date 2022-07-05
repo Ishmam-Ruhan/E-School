@@ -20,7 +20,7 @@ public class User implements Serializable {
     @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false, unique = true)
     private String userId;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false,unique = true)
     private String email;
 
     @Column(name = "phone", nullable = false)
