@@ -1,39 +1,6 @@
-#Application Server Port
-server:
-  port: 8081
-
-#Application Server Name
 spring:
   application:
     name: e-school
 
-  jackson:
-    time-zone: Asia/Dhaka
-
-  main:
-    allow-circular-references: true   # Some beans is depended upon another bean. By setting up this dependency, no compiler error will occur regarding this.
-
-  #Application Database Setup
-  datasource:
-    url: jdbc:postgresql://172.17.0.2:5432/e_school
-    username: postgres
-    password: root
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL9Dialect
-        #dialect: org.hibernate.dialect.MySQL8Dialect
-        #generate_statistics: true
-        enable_lazy_load_no_trans: true                     # To avoid "failed to lazily initialize a collection of role could not initialize proxy - no session" error
-        jdbc:
-          batch_size: 50
-          order_inserts: true
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
-#OpenAPI Swagger-UI Custom Path
-springdoc:
-  swagger-ui:
-    path: /documentation
-
+  profiles:
+    active: production
