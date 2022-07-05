@@ -55,7 +55,7 @@ public class Course implements Serializable {
     @JsonIgnoreProperties(value = {"users", "createdBy","course"})
     private Set<Meeting> meetings = new HashSet<>();
 
-    private Boolean isClosed;
+    private Boolean isClosed = false;
 
     @Temporal(TemporalType.DATE)
     @CreatedDate

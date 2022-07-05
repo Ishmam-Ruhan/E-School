@@ -43,7 +43,7 @@ public class CourseServiceImplementation implements CourseService {
     @Override
     public Course createCourse(String userId, Course course) throws CustomException {
 
-        UserDescription userDescription = userDescriptionService.getUserDescription(userId);
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole() == Role.STUDENT)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a course! They can only join.");
@@ -66,7 +66,7 @@ public class CourseServiceImplementation implements CourseService {
 
     @Override
     public Course joinCourse(String userId, String joiningCode) throws CustomException {
-        UserDescription userDescription = userDescriptionService.getUserDescription(userId);
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole() == Role.TEACHER)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Teachers are not allowed to join a course! They can only create course.");
@@ -97,7 +97,7 @@ public class CourseServiceImplementation implements CourseService {
         if(Objects.isNull(courseToRemove))
             throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+courseId);
 
-        UserDescription userDescription = userDescriptionService.getUserDescription(userId);
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(!userDescription.checkIfUserAlreadyEnrolledThisCourse(courseToRemove))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course.");

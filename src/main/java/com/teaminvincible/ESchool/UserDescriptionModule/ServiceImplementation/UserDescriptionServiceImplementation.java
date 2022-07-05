@@ -1,5 +1,6 @@
 package com.teaminvincible.ESchool.UserDescriptionModule.ServiceImplementation;
 
+import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
@@ -27,6 +28,9 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     @Autowired
     private CourseService courseService;
 
+    @Autowired
+    private CurrentUser currentUser;
+
     public UserDescription findUserDescriptionByUserId(String userId) throws CustomException{
         return userDescriptionRepository.findByuserId(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "No User Description Found With Id: "+userId));
@@ -53,31 +57,31 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     }
 
     @Override
-    public UserDescription getUserDescription(String userId) throws CustomException {
-        return findUserDescriptionByUserId(userId);
+    public UserDescription getUserDescription() throws CustomException {
+        return findUserDescriptionByUserId(currentUser.getCurrentUserId());
     }
 
     @Override
-    public Role getRoleFromUserDescription(String userId) throws CustomException {
-        return findUserDescriptionByUserId(userId).getRole();
+    public Role getRoleFromUserDescription() throws CustomException {
+        return findUserDescriptionByUserId(currentUser.getCurrentUserId()).getRole();
     }
 
     @Override
-    public Set<Course> getCoursesOfAUser(String userId) throws CustomException {
-        UserDescription userDescription = findUserDescriptionByUserId(userId);
+    public Set<Course> getCoursesOfAUser() throws CustomException {
+        UserDescription userDescription = findUserDescriptionByUserId(currentUser.getCurrentUserId());
 
         if(userDescription.getRole().equals(Role.STUDENT))return userDescription.getCourses();
 
-        return courseService.getAllCourseOfATeacher(userId);
+        return courseService.getAllCourseOfATeacher(currentUser.getCurrentUserId());
     }
 
     @Override
-    public Set<Task> getTasksOfUser(String userId) throws CustomException {
-        return findUserDescriptionByUserId(userId).getTasks();
+    public Set<Task> getTasksOfUser() throws CustomException {
+        return findUserDescriptionByUserId(currentUser.getCurrentUserId()).getTasks();
     }
 
     @Override
-    public Set<Meeting> getMeetingsOfUser(String userId) throws CustomException {
-        return findUserDescriptionByUserId(userId).getMeetings();
+    public Set<Meeting> getMeetingsOfUser() throws CustomException {
+        return findUserDescriptionByUserId(currentUser.getCurrentUserId()).getMeetings();
     }
 }

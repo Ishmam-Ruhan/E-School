@@ -1,0 +1,35 @@
+#Application Server Port
+server:
+  port: 8081
+
+#Application Server Time-Zone
+spring:
+  jackson:
+    time-zone: Asia/Dhaka
+
+  main:
+    allow-circular-references: true
+
+  #Application Database Setup
+  datasource:
+    url: jdbc:postgresql://ec2-44-205-41-76.compute-1.amazonaws.com:5432/d9glvb2qccc5kv
+    username: rvqlzksdocayjl
+    password: cdc9644cbc0190f33dfcbd50ad5baa23dcffc513fe5657a77d080bc34cdf150f
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+        enable_lazy_load_no_trans: true
+        jdbc:
+          batch_size: 50
+          order_inserts: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+#OpenAPI Swagger-UI Custom Path
+springdoc:
+  swagger-ui:
+    path: /documentation
+

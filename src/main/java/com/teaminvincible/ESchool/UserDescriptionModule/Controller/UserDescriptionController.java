@@ -36,70 +36,70 @@ public class UserDescriptionController {
     @Operation(
             summary = "Get a user's description by user-id"
     )
-    @GetAPI("/get-description/user/{userId}")
-    public ResponseEntity getUserDescription(@PathVariable String userId){
+    @GetAPI("/get-description")
+    public ResponseEntity getUserDescription(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "Successfully fetched user description with ID: "+userId,
-                        userDescriptionService.getUserDescription(userId)
+                        "Successfully fetched user description",
+                        userDescriptionService.getUserDescription()
                 ));
     }
 
     @Operation(
             summary = "Get a user's role by user-id"
     )
-    @GetAPI("/get-role/user/{userId}")
-    public ResponseEntity getRoleFromUserDescription(@PathVariable String userId){
+    @GetAPI("/get-role")
+    public ResponseEntity getRoleFromUserDescription(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "Successfully fetched user's role with ID: "+userId,
-                        userDescriptionService.getRoleFromUserDescription(userId)
+                        "Successfully fetched user's role",
+                        userDescriptionService.getRoleFromUserDescription()
                 ));
     }
 
     @Operation(
             summary = "Get courses by user-id"
     )
-    @GetAPI("/get-course/user/{userId}")
-    public ResponseEntity getCoursesOfAUser(@PathVariable String userId){
+    @GetAPI("/get-course")
+    public ResponseEntity getCoursesOfAUser(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "Successfully fetched user's courses with ID: "+userId,
-                        userDescriptionService.getCoursesOfAUser(userId)
+                        "Successfully fetched user's courses",
+                        userDescriptionService.getCoursesOfAUser()
                 ));
     }
 
     @Operation(
             summary = "Get tasks by user-id"
     )
-    @GetAPI("/get-task/user/{userId}")
-    public ResponseEntity getTasksOfAUser(@PathVariable String userId){
+    @GetAPI("/get-task")
+    public ResponseEntity getTasksOfAUser(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "Successfully fetched user's tasks with ID: "+userId,
-                        userDescriptionService.getTasksOfUser(userId)
+                        "Successfully fetched user's tasks",
+                        userDescriptionService.getTasksOfUser()
                 ));
     }
 
     @Operation(
             summary = "Get meetings by user-id"
     )
-    @GetAPI("/get-meeting/user/{userId}")
-    public ResponseEntity getMeetingsOfAUser(@PathVariable String userId){
+    @GetAPI("/get-meeting")
+    public ResponseEntity getMeetingsOfAUser(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "Successfully fetched user's meetings with ID: "+userId,
-                        userDescriptionService.getMeetingsOfUser(userId)
+                        "Successfully fetched user's meetings",
+                        userDescriptionService.getMeetingsOfUser()
                 ));
     }
 }
