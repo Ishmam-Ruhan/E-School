@@ -10,10 +10,11 @@ import com.teaminvincible.ESchool.CourseModule.Repository.CourseRepository;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
+import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
 import com.teaminvincible.ESchool.Utility.CodeGenerator;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,9 @@ public class CourseServiceImplementation implements CourseService {
 
     @Autowired
     private UserDescriptionService userDescriptionService;
+
+    @Autowired
+    private MeetingService meetingService;
 
     @Autowired
     private CurrentUser currentUser;
@@ -101,9 +105,6 @@ public class CourseServiceImplementation implements CourseService {
 
         Course courseToRemove= findCourseById(courseId);
 
-        if(Objects.isNull(courseToRemove))
-            throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+courseId);
-
         UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 
         if(!userDescription.checkIfUserAlreadyEnrolledThisCourse(courseToRemove))
@@ -142,9 +143,6 @@ public class CourseServiceImplementation implements CourseService {
 
         Course course = findCourseById(courseId);
 
-        if(Objects.isNull(course))
-            throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+course.getCourseId());
-
         if(!course.getCourseOwner().getUserId().equals(currentUser.getCurrentUserId()))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the owner of this course.");
 
@@ -165,6 +163,28 @@ public class CourseServiceImplementation implements CourseService {
         courseSet.addAll( courseRepository.findAll(CourseSpecification.findCourseByCourseOwner(userId)));
 
         return courseSet;
+    }
+
+    @Override
+    public Set<Meeting> getAllMeetingsOfCourse(String courseId) throws CustomException {
+        Course course = findCourseById(courseId);
+        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+
+        if(userDescription.getRole().equals(Role.STUDENT)){
+            Optional<UserDescription> enrolled = course.getStudents().stream()
+                    .filter(student -> student.getUserId().equals(currentUser.getCurrentUserId()))
+                    .findFirst();
+
+            if(enrolled.isEmpty())
+                throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course!");
+        }
+
+        else if(!userDescription.getUserId().equals(course.getCourseOwner().getUserId())){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not the authority of this course!");
+        }
+
+
+        return meetingService.getAllMeetingOfACourse(courseId);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.teaminvincible.ESchool.CourseModule.Controller;
 
 import com.teaminvincible.ESchool.Annotations.DeleteAPI;
+import com.teaminvincible.ESchool.Annotations.GetAPI;
 import com.teaminvincible.ESchool.Annotations.PostAPI;
 import com.teaminvincible.ESchool.Annotations.PutAPI;
 import com.teaminvincible.ESchool.CourseModule.DTO.CreateCourseRequest;
@@ -77,6 +78,20 @@ public class CourseController {
                         true,
                         "Un-Enrolled Course successfully.",
                         courseService.unEnrollFromACourse(courseId)
+                ));
+    }
+
+    @Operation(
+            summary = "Get all meetings of a enrolled course."
+    )
+    @GetAPI("/get-meetings/course/{courseId}")
+    public ResponseEntity getMeetings(@PathVariable String courseId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response<>(
+                        HttpStatus.OK,
+                        true,
+                        "Un-Enrolled Course successfully.",
+                        courseService.getAllMeetingsOfCourse(courseId)
                 ));
     }
 

@@ -1,11 +1,19 @@
 package com.teaminvincible.ESchool.MeetingModule.ServiceImplementation;
 
+import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
+import com.teaminvincible.ESchool.CourseModule.Entity.Course;
+import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
+import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.MeetingModule.DTO.CreateMeetingRequest;
 import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingSearchCriteria;
 import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingSpecification;
+import com.teaminvincible.ESchool.MeetingModule.DTO.UpdateMeetingRequest;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Repository.MeetingRepository;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
+import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
+import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +28,12 @@ public class MeetingServiceImplementation implements MeetingService {
     private MeetingRepository meetingRepository;
 
 
+    @Autowired
+    private UserDescriptionService userDescriptionService;
+
+
+    @Autowired
+    private CurrentUser currentUser;
 
     public Meeting findMeetingById(String id){
 
@@ -34,51 +48,83 @@ public class MeetingServiceImplementation implements MeetingService {
 
 
     @Override
-    public Meeting createMeeting(Meeting meeting) throws CustomException {
+    public Meeting createMeeting(String courseId, CreateMeetingRequest createMeetingRequest) throws CustomException {
 
-        if(meeting.getCourse() == null || meeting.getCreatedBy() == null)
-            throw new CustomException(HttpStatus.BAD_REQUEST,"Must have to include a valid user and a course!");
+        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 
-        Meeting meeting1 = null;
+        if(userDescription.getRole() == Role.STUDENT)
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a meeting! They can only participate.");
+
+        Optional<Course> targetCourse = userDescriptionService.getCoursesOfAUser().stream()
+                .filter(course -> course.getCourseId().equals(courseId))
+                .findFirst();
+
+        if(targetCourse.isEmpty())
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Course unavailable! Can't process the request. Please try again.");
+
+        Meeting meeting = new Meeting();
+            meeting.setMeetingTitle(createMeetingRequest.getMeetingTitle());
+            meeting.setMeetingAgenda(createMeetingRequest.getMeetingAgenda());
+            meeting.setMeetingDescription(createMeetingRequest.getMeetingDescription());
+            meeting.setMeetingAvailableLink(createMeetingRequest.getMeetingAvailableLink());
+            meeting.setStartTime(createMeetingRequest.getStartTime());
+            meeting.setEndTime(createMeetingRequest.getEndTime());
+
+            meeting.setCourse(targetCourse.get());
+            meeting.setCreatedBy(userDescription);
 
         try{
-            meeting1 = meetingRepository.save(meeting);
+            meeting = meetingRepository.save(meeting);
         }catch (Exception ex){
             throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process the request right now! Please try again.");
         }
 
-        return meeting1;
+        userDescriptionService.saveMeetingToUsers(targetCourse.get().getStudents(), meeting);
+
+        return meeting;
     }
 
     @Override
-    public Meeting updateMeeting(Meeting meeting) throws CustomException {
+    public Meeting updateMeeting(UpdateMeetingRequest updateMeetingRequest) throws CustomException {
 
-        if(meeting.getCourse() == null || meeting.getCreatedBy() == null)
-            throw new CustomException(HttpStatus.BAD_REQUEST,"Must have to include a valid user and a course!");
+        Meeting existingMeeting = findMeetingById(updateMeetingRequest.getMeetingId());
 
-        Meeting previousMeeting = findMeetingById(meeting.getMeetingId());
+        if(!existingMeeting.getCreatedBy().getUserId().equals(currentUser.getCurrentUserId()))
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the creator of this meeting!");
 
-        Meeting updatedMeeting = new Meeting();
+        existingMeeting.setMeetingTitle(updateMeetingRequest.getMeetingTitle());
+        existingMeeting.setMeetingAgenda(updateMeetingRequest.getMeetingAgenda());
+        existingMeeting.setMeetingDescription(updateMeetingRequest.getMeetingDescription());
+        existingMeeting.setMeetingAvailableLink(updateMeetingRequest.getMeetingAvailableLink());
+        existingMeeting.setStartTime(updateMeetingRequest.getStartTime());
+        existingMeeting.setEndTime(updateMeetingRequest.getEndTime());
 
-        BeanUtils.copyProperties(meeting,updatedMeeting);
+        try {
+            meetingRepository.save(existingMeeting);
+        }catch (Exception ex){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process it right now. Please try again.");
+        }
 
-        updatedMeeting.setMeetingId(previousMeeting.getMeetingId());
-
-        return createMeeting(updatedMeeting);
+        return existingMeeting;
     }
 
     @Override
     public String deleteMeeting(String meetingId) throws CustomException {
 
-        Meeting meeting = findMeetingById(meetingId);
+        Meeting meetingToRemove = findMeetingById(meetingId);
+
+        UserDescription currentUserDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+
+        if(!meetingToRemove.getCreatedBy().getUserId().equals(currentUserDescription.getUserId()))
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the creator of the meeting.");
 
         try{
-            meetingRepository.deleteById(meeting.getMeetingId());
+            meetingRepository.deleteById(meetingId);
         }catch (Exception ex){
-            throw new CustomException(HttpStatus.BAD_REQUEST,ex.getMessage());
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Can't perform this operation right now!");
         }
 
-        return "Successfully deleted meeting: "+meeting.getMeetingTitle();
+        return "Successfully deleted meeting: "+meetingToRemove.getMeetingTitle();
     }
 
     @Override
@@ -89,10 +135,6 @@ public class MeetingServiceImplementation implements MeetingService {
         return "Successfully deleted all meetings!";
     }
 
-    @Override
-    public Set<Meeting> getAllMeetingsFromUser(String userId) throws CustomException {
-        return (Set<Meeting>) meetingRepository.findAll(MeetingSpecification.searchByMeetingUserId(userId));
-    }
 
     @Override
     public Meeting getMeetingDetails(String meetingId) throws CustomException {
@@ -100,48 +142,25 @@ public class MeetingServiceImplementation implements MeetingService {
     }
 
     @Override
-    public Set<Meeting> getAllMeetingsFromCourse(String courseId) throws CustomException {
-        return (Set<Meeting>) meetingRepository.findAll(MeetingSpecification.searchByMeetingCourseId(courseId));
+    public Set<Meeting> getAllMeetingsOfACreator(String userId) throws CustomException {
+
+        Set<Meeting> resultSet = new HashSet<>();
+        resultSet.addAll(meetingRepository.findAll(MeetingSpecification.searchByMeetingUserId(userId)));
+
+        return resultSet;
     }
 
     @Override
-    public Set<Meeting> searchMeetingsFromUser(String userId, MeetingSearchCriteria meetingSearchCriteria) throws CustomException {
-        return null;
+    public Set<Meeting> getAllMeetingOfACourse(String courseId) throws CustomException {
+        Set<Meeting> resultSet = new HashSet<>();
+        resultSet.addAll(meetingRepository.findAll(MeetingSpecification.searchByMeetingCourseId(courseId)));
+
+        return resultSet;
     }
 
-    @Override
-    public Set<Meeting> searchMeetingsFromCourse(String courseId, MeetingSearchCriteria meetingSearchCriteria) throws CustomException {
-        return null;
-    }
-
-//    public Set<Meeting> searchMeeting(Boolean isUser, String id, MeetingSearchCriteria searchCriteria){
-//
-//        List<Specification<Meeting>> specifications = new ArrayList<>();
-//
-//        if(isUser) specifications.add(MeetingSpecification.searchByMeetingUserId(id));
-//        else specifications.add(MeetingSpecification.searchByMeetingCourseId(id));
-//
-//        if(Objects.nonNull(searchCriteria.getMeetingId())){
-//            specifications.add(MeetingSpecification.searchByMeetingId(searchCriteria.getMeetingId()));
-//        }
-//
-//        if(Objects.nonNull(searchCriteria.getMeetingTitle())){
-//            specifications.add(MeetingSpecification.searchByMeetingTitle(searchCriteria.getMeetingTitle()));
-//        }
-//
-//        if(Objects.nonNull(searchCriteria.getMeetingAgenda())){
-//            specifications.add(MeetingSpecification.searchByMeetingAgenda(searchCriteria.getMeetingAgenda()));
-//        }
-//
-//        if(Objects.nonNull(searchCriteria.getClosed())){
-//            specifications.add(MeetingSpecification.searchByMeetingIsClosed(searchCriteria.getClosed()));
-//        }
-//
-//        if(Objects.nonNull(searchCriteria.getCreatedAt())){
-//            specifications.add(MeetingSpecification.searchByMeetingCreatedAt(searchCriteria.getCreatedAt()));
-//        }
-//
-//        meetingRepository.findAll();
-//
+//    @Override
+//    public Set<Meeting> getAllMeetingsFromCourse(String courseId) throws CustomException {
+//        return (Set<Meeting>) meetingRepository.findAll(MeetingSpecification.searchByMeetingCourseId(courseId));
 //    }
+
 }

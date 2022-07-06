@@ -6,6 +6,8 @@ server:
 spring:
   jackson:
     time-zone: Asia/Dhaka
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
 
   main:
     allow-circular-references: true   # Some beans is depended upon another bean. By setting up this dependency, no compiler error will occur regarding this.
