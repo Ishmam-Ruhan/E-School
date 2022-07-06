@@ -52,7 +52,7 @@ public class Course implements Serializable {
     private Set<Task> tasks = new HashSet<>();
 
     @OneToMany(mappedBy = "course", cascade = {CascadeType.MERGE,CascadeType.PERSIST}, orphanRemoval = true)
-    @JsonIgnoreProperties(value = {"users", "createdBy","course"})
+    @JsonIgnoreProperties(value = {"participants", "createdBy","course","meetingAgenda","meetingDescription","meetingAvailableLink"})
     private Set<Meeting> meetings = new HashSet<>();
 
     private Boolean isClosed = false;

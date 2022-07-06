@@ -26,4 +26,5 @@ public interface UserDescriptionService {
 
     Set<Meeting> getMeetingsOfUser() throws CustomException;
 
+    void saveMeetingToUsers(Set<UserDescription> students, Meeting meeting) throws CustomException;
 }

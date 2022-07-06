@@ -1,7 +1,6 @@
 package com.teaminvincible.ESchool.UserDescriptionModule.Entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.Enums.Role;
@@ -46,7 +45,7 @@ public class UserDescription implements Serializable {
                     @JoinColumn(name = "courseId")
             }
     )
-    @JsonIgnoreProperties(value = {"courseOwner","students","tasks","meetings"})
+    @JsonIgnoreProperties(value = {"courseOwner","students","tasks","meetings","courseJoiningCode","courseSubTitle","createdDate"})
     private Set<Course> courses = new HashSet<>();
 
 
@@ -73,7 +72,7 @@ public class UserDescription implements Serializable {
                     @JoinColumn(name = "meetingId")
             }
     )
-    @JsonIgnoreProperties(value = {"users","createdBy","course"})
+    @JsonIgnoreProperties(value = {"participants", "createdBy","course","meetingAgenda","meetingDescription","meetingAvailableLink"})
     private Set<Meeting> meetings = new HashSet<>();
 
     public UserDescription() {
@@ -160,6 +159,13 @@ public class UserDescription implements Serializable {
         this.meetings = meetings;
     }
 
+    public Course getSpecificCourse(String courseId){
+        for(Course course : courses){
+            if(course.getCourseId().equals(courseId))return course;
+        }
+        return null;
+    }
+
     public void removeCourse(Course course){
         this.courses.remove(course);
         course.getStudents().remove(this);
@@ -167,7 +173,7 @@ public class UserDescription implements Serializable {
 
     public void removeMeetingFromUser(Meeting meeting){
         this.meetings.remove(meeting);
-        meeting.getUsers().remove(this);
+        meeting.getParticipants().remove(this);
     }
 
     public Boolean checkIfUserAlreadyEnrolledThisCourse(Course course){

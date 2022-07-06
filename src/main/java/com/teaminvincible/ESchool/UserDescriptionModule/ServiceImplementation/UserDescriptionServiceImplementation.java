@@ -6,6 +6,7 @@ import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
+import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.TaskModule.Entity.Task;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Repository.UserDescriptionRepository;
@@ -27,6 +28,9 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private MeetingService meetingService;
 
     @Autowired
     private CurrentUser currentUser;
@@ -97,6 +101,26 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
 
     @Override
     public Set<Meeting> getMeetingsOfUser() throws CustomException {
-        return getUserDescription(currentUser.getCurrentUserId()).getMeetings();
+        UserDescription userDescription = findUserDescriptionByUserId(currentUser.getCurrentUserId());
+
+        if(userDescription.getRole().equals(Role.STUDENT))
+            return userDescription.getMeetings();
+
+        return meetingService.getAllMeetingsOfACreator(userDescription.getUserId());
+    }
+
+    @Override
+    public void saveMeetingToUsers(Set<UserDescription> students, Meeting meeting) throws CustomException{
+        try{
+            students.forEach(
+                    student -> {
+                        Set<Meeting> meetingSet = student.getMeetings();
+                        meetingSet.add(meeting);
+                        userDescriptionRepository.save(student);
+                    }
+            );
+        }catch (Exception ex){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Something went wrong! Please try again.");
+        }
     }
 }

@@ -28,24 +28,32 @@ public class Meeting implements Serializable {
     private String meetingTitle;
 
     private String meetingAgenda;
+    private String meetingDescription;
+    private String meetingAvailableLink;
 
-    private String meetingSchedule;
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+    private Date startTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+    private Date endTime;
 
     @ManyToMany(mappedBy = "meetings")
     @JsonIgnoreProperties(value = {"courses","user","tasks","meetings"})
-    private Set<UserDescription>  users = new HashSet<>();
+    private Set<UserDescription>  participants = new HashSet<>();
 
     @OneToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinColumn(name = "courseOwnerId")
-    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings"})
+    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings","role"})
     private UserDescription createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
-    @JsonIgnoreProperties(value = {"courseOwner","students","tasks","meetings"})
+    @JsonIgnoreProperties(value = {"courseOwner","students","tasks","meetings","courseJoiningCode","courseSubTitle","createdDate"})
     private Course course;
 
-    private Boolean isClosed;
+    private Boolean isClosed = false;
 
     @Temporal(TemporalType.DATE)
     @CreatedDate
@@ -56,12 +64,15 @@ public class Meeting implements Serializable {
     public Meeting() {
     }
 
-    public Meeting(String meetingId, String meetingTitle, String meetingAgenda, String meetingSchedule, Set<UserDescription> users, UserDescription createdBy, Course course, Boolean isClosed, Date createdAt) {
+    public Meeting(String meetingId, String meetingTitle, String meetingAgenda, String meetingDescription, String meetingAvailableLink, Date startTime, Date endTime, Set<UserDescription> users, UserDescription createdBy, Course course, Boolean isClosed, Date createdAt) {
         this.meetingId = meetingId;
         this.meetingTitle = meetingTitle;
         this.meetingAgenda = meetingAgenda;
-        this.meetingSchedule = meetingSchedule;
-        this.users = users;
+        this.meetingDescription = meetingDescription;
+        this.meetingAvailableLink = meetingAvailableLink;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.participants = users;
         this.createdBy = createdBy;
         this.course = course;
         this.isClosed = isClosed;
@@ -70,7 +81,7 @@ public class Meeting implements Serializable {
 
     @PreRemove
     public void beforeRemovingEntity(){
-        this.users.forEach(userDescription -> {
+        this.participants.forEach(userDescription -> {
             userDescription.removeMeetingFromUser(this);
         });
         this.createdBy  = null;
@@ -78,7 +89,7 @@ public class Meeting implements Serializable {
     }
 
     public void removeUserFromMeeting(UserDescription userDescription){
-        this.users.remove(userDescription);
+        this.participants.remove(userDescription);
         userDescription.getMeetings().remove(this);
     }
 
@@ -119,20 +130,44 @@ public class Meeting implements Serializable {
         this.meetingAgenda = meetingAgenda;
     }
 
-    public String getMeetingSchedule() {
-        return meetingSchedule;
+    public String getMeetingDescription() {
+        return meetingDescription;
     }
 
-    public void setMeetingSchedule(String meetingSchedule) {
-        this.meetingSchedule = meetingSchedule;
+    public void setMeetingDescription(String meetingDescription) {
+        this.meetingDescription = meetingDescription;
     }
 
-    public Set<UserDescription> getUsers() {
-        return users;
+    public String getMeetingAvailableLink() {
+        return meetingAvailableLink;
     }
 
-    public void setUsers(Set<UserDescription> users) {
-        this.users = users;
+    public void setMeetingAvailableLink(String meetingAvailableLink) {
+        this.meetingAvailableLink = meetingAvailableLink;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Set<UserDescription> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(Set<UserDescription> users) {
+        this.participants = users;
     }
 
     public UserDescription getCreatedBy() {
@@ -167,15 +202,17 @@ public class Meeting implements Serializable {
         this.createdAt = createdAt;
     }
 
-
     @Override
     public String toString() {
         return "Meeting{" +
                 "meetingId='" + meetingId + '\'' +
                 ", meetingTitle='" + meetingTitle + '\'' +
                 ", meetingAgenda='" + meetingAgenda + '\'' +
-                ", meetingSchedule='" + meetingSchedule + '\'' +
-                ", users=" + users +
+                ", meetingDescription='" + meetingDescription + '\'' +
+                ", meetingAvailableLink='" + meetingAvailableLink + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", participants=" + participants +
                 ", createdBy=" + createdBy +
                 ", course=" + course +
                 ", isClosed=" + isClosed +
