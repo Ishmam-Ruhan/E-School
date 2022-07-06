@@ -1,7 +1,7 @@
-package com.teaminvincible.ESchool.AuthModule.Service.Security.Configuration;
+package com.teaminvincible.ESchool.Security.Configuration;
 
-import com.teaminvincible.ESchool.AuthModule.Service.Security.Filters.JwtFilter;
-import com.teaminvincible.ESchool.AuthModule.Service.Security.Services.CustomUserDetailsService;
+import com.teaminvincible.ESchool.Security.Filters.JwtFilter;
+import com.teaminvincible.ESchool.Security.Services.CustomUserDetailsService;
 import com.teaminvincible.ESchool.Configurations.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers(AppConstants.UNAUTHORIZED_GETWAYS()).permitAll()
+                .antMatchers(AppConstants.UNAUTHORIZED_GATEWAYS()).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
@@ -39,11 +39,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(AppConstants.UNAUTHORIZED_GETWAYS());
     }
 
     @Override

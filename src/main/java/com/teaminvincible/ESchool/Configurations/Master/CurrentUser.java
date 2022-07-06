@@ -1,10 +1,7 @@
 package com.teaminvincible.ESchool.Configurations.Master;
 
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
-import com.teaminvincible.ESchool.AuthModule.Service.Security.Services.CustomUserDetails;
-import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
-import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
-import com.teaminvincible.ESchool.UserModule.Entity.User;
+import com.teaminvincible.ESchool.Security.Services.CustomUserDetails;
 import com.teaminvincible.ESchool.UserModule.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

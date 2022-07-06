@@ -3,10 +3,11 @@ package com.teaminvincible.ESchool.AuthModule.ServiceImplementation;
 import com.teaminvincible.ESchool.AuthModule.DTO.CreateUserRequest;
 import com.teaminvincible.ESchool.AuthModule.DTO.SignInRequest;
 import com.teaminvincible.ESchool.AuthModule.Service.AuthService;
-import com.teaminvincible.ESchool.AuthModule.Service.Security.Services.CustomUserDetails;
+import com.teaminvincible.ESchool.Security.Services.CustomUserDetails;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
-import com.teaminvincible.ESchool.AuthModule.Service.Security.JWT.JwtGenerator;
+import com.teaminvincible.ESchool.Security.JWT.JwtGenerator;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
+import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
 import com.teaminvincible.ESchool.UserModule.Entity.User;
 import com.teaminvincible.ESchool.UserModule.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Primary
@@ -27,6 +29,9 @@ public class AuthServiceImplementation implements AuthService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserDescriptionService userDescriptionService;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -45,23 +50,25 @@ public class AuthServiceImplementation implements AuthService {
     }
 
     @Override
+    @Transactional(rollbackFor = {CustomException.class,Exception.class})
     public String registration(CreateUserRequest userRequest) throws CustomException {
 
         if(userService.isUserExistWithEmail(userRequest.getEmail()))
             throw new CustomException(HttpStatus.BAD_REQUEST, "User already exist with email: "+userRequest.getEmail());
 
         User newUser = new User();
-        newUser.setEmail(userRequest.getEmail());
-        newUser.setRole(userRequest.getRole());
-        newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        newUser.setPhone(userRequest.getPhone());
+            newUser.setEmail(userRequest.getEmail());
+            newUser.setRole(userRequest.getRole());
+            newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+            newUser.setPhone(userRequest.getPhone());
 
         UserDescription newUserDescription = new UserDescription(newUser);
-        newUserDescription.setName(userRequest.getName());
+            newUserDescription.setName(userRequest.getName());
 
-        newUser.setUserDescription(newUserDescription);
+        userService.saveNewUser(newUser).getUserId();
+            newUserDescription.setUserId(userService.getUserByEmail(newUser.getEmail()).getUserId());
 
-        userService.saveNewUser(newUser);
+        userDescriptionService.createUserDescription(newUserDescription);
 
         return "Registration Completed Successfully!";
     }

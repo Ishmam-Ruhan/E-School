@@ -3,6 +3,8 @@ package com.teaminvincible.ESchool.CourseModule.ServiceImplementation;
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
 import com.teaminvincible.ESchool.CourseModule.DTO.CourseSearchCriteria;
 import com.teaminvincible.ESchool.CourseModule.DTO.CourseSpecification;
+import com.teaminvincible.ESchool.CourseModule.DTO.CreateCourseRequest;
+import com.teaminvincible.ESchool.CourseModule.DTO.UpdateCourseRequest;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.CourseModule.Repository.CourseRepository;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
@@ -44,27 +46,29 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course createCourse(Course course) throws CustomException {
+    public Course createCourse(CreateCourseRequest courseRequest) throws CustomException {
 
         UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 
         if(userDescription.getRole() == Role.STUDENT)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a course! They can only join.");
 
-        Course course1;
+        Course course = new Course();
+        course.setCourseTitle(courseRequest.getCourseTitle());
+        course.setCourseSubTitle(courseRequest.getCourseSubTitle());
+        course.setCourseOwner(userDescription);
 
         if(course.getCourseJoiningCode() == null)
             course.setCourseJoiningCode(CodeGenerator.generateCourseJoinCode());
 
-        course.setCourseOwner(userDescription);
 
         try{
-            course1 = courseRepository.save(course);
+            courseRepository.save(course);
         }catch (Exception ex){
             throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process the request right now! Please try again.");
         }
 
-        return course1;
+        return course;
     }
 
     @Override
@@ -113,22 +117,24 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course updateCourse(Course course) throws CustomException {
-        Course oldCourse = findCourseById(course.getCourseId());
+    public Course updateCourse(UpdateCourseRequest updateCourseRequest) throws CustomException {
+        Course originalCourse = findCourseById(updateCourseRequest.getCourseId());
 
-        if(Objects.isNull(oldCourse))
-            throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+course.getCourseId());
+        if(Objects.isNull(originalCourse))
+            throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+updateCourseRequest.getCourseId());
 
-        if(!oldCourse.getCourseOwner().getUserId().equals(currentUser.getCurrentUserId()))
+        if(!originalCourse.getCourseOwner().getUserId().equals(currentUser.getCurrentUserId()))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the owner of this course.");
 
-        Course updatedCourse = new Course();
+        originalCourse.setCourseTitle(updateCourseRequest.getCourseTitle());
+        originalCourse.setCourseSubTitle(updateCourseRequest.getCourseSubTitle());
 
-        BeanUtils.copyProperties(course,updatedCourse);
-
-        updatedCourse.setCourseId(oldCourse.getCourseId());
-
-        return createCourse(updatedCourse);
+        try {
+            courseRepository.save(originalCourse);
+        }catch (Exception ex){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Can't Process the request right now!");
+        }
+        return originalCourse;
     }
 
     @Override

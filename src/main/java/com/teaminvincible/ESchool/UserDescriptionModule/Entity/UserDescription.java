@@ -31,11 +31,6 @@ public class UserDescription implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     public Role role;
 
-    @OneToOne
-    @MapsId
-    @JsonIgnore
-    private User user;
-
     /**
      *  User Image field should be added
      */
@@ -85,15 +80,13 @@ public class UserDescription implements Serializable {
     }
 
     public UserDescription(User user) {
-        this.user = user;
         this.setRole(user.getRole());
     }
 
-    public UserDescription(String userId, String name, Role role, User user, Set<Course> courses, Set<Task> tasks, Set<Meeting> meetings) {
+    public UserDescription(String userId, String name, Role role, Set<Course> courses, Set<Task> tasks, Set<Meeting> meetings) {
         this.userId = userId;
         this.name = name;
         this.role = role;
-        this.user = user;
         this.courses = courses;
         this.tasks = tasks;
         this.meetings = meetings;
@@ -101,7 +94,6 @@ public class UserDescription implements Serializable {
 
     @PreRemove
     public void beforeRemovingEntity(){
-        this.user = null;
         this.courses = new HashSet<>();
         this.tasks = new HashSet<>();
         this.meetings = new HashSet<>();
@@ -142,14 +134,6 @@ public class UserDescription implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public Set<Course> getCourses() {
@@ -196,7 +180,6 @@ public class UserDescription implements Serializable {
                 "userId='" + userId + '\'' +
                 ", name='" + name + '\'' +
                 ", role=" + role +
-                ", user=" + user +
                 ", courses=" + courses +
                 ", tasks=" + tasks +
                 ", meetings=" + meetings +

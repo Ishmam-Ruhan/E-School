@@ -35,9 +35,6 @@ public class User implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Role role;
 
-    @OneToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, orphanRemoval = true,mappedBy = "user")
-    private UserDescription userDescription;
-
     @Temporal(TemporalType.DATE)
     @CreatedDate
     @Column(nullable = false,updatable = false)
@@ -53,11 +50,6 @@ public class User implements Serializable {
         this.phone = phone;
         this.password = password;
         this.role = role;
-    }
-
-    @PreRemove
-    public void beforeRemovingObject(){
-        userDescription = null;
     }
 
 
@@ -99,14 +91,6 @@ public class User implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public UserDescription getUserDescription() {
-        return userDescription;
-    }
-
-    public void setUserDescription(UserDescription userDescription) {
-        this.userDescription = userDescription;
     }
 
     public Date getJoinedDate() {

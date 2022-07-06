@@ -3,10 +3,12 @@ package com.teaminvincible.ESchool.CourseModule.Controller;
 import com.teaminvincible.ESchool.Annotations.DeleteAPI;
 import com.teaminvincible.ESchool.Annotations.PostAPI;
 import com.teaminvincible.ESchool.Annotations.PutAPI;
-import com.teaminvincible.ESchool.CourseModule.Entity.Course;
+import com.teaminvincible.ESchool.CourseModule.DTO.CreateCourseRequest;
+import com.teaminvincible.ESchool.CourseModule.DTO.UpdateCourseRequest;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Output.Response;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +25,15 @@ public class CourseController {
     @Operation(
             summary = "Create a course."
     )
+    @Schema(name = "create course", implementation = CreateCourseRequest.class)
     @PostAPI("/create-course")
-    public ResponseEntity createCourse(@RequestBody Course course){
+    public ResponseEntity createCourse(@RequestBody CreateCourseRequest courseRequest){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new Response<>(
                    HttpStatus.CREATED,
                    true,
                    "Course created successfully.",
-                   courseService.createCourse(course)
+                   courseService.createCourse(courseRequest)
                 ));
     }
 
@@ -38,13 +41,14 @@ public class CourseController {
             summary = "Update a course."
     )
     @PutAPI("/update-course")
-    public ResponseEntity updateCourse(@RequestBody Course course){
+    @Schema(name = "update course schema", implementation = UpdateCourseRequest.class)
+    public ResponseEntity updateCourse(@RequestBody UpdateCourseRequest updateCourseRequest){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
                         "Course updated successfully.",
-                        courseService.updateCourse(course)
+                        courseService.updateCourse(updateCourseRequest)
                 ));
     }
 

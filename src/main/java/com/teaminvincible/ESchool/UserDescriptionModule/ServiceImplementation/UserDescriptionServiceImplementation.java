@@ -37,6 +37,21 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     }
 
     @Override
+    public UserDescription createUserDescription(UserDescription userDescription) throws CustomException {
+        if(userDescription.getUserId() == null)
+            throw new CustomException(HttpStatus.BAD_REQUEST,"No User Id Found!");
+
+        UserDescription userDescription1;
+
+        try{
+            userDescription1 = userDescriptionRepository.save(userDescription);
+        }catch (Exception ex){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process it right now! Please try again.");
+        }
+        return userDescription1;
+    }
+
+    @Override
     public UserDescription updateUserDescription(UserDescription userDescription) throws CustomException {
 
         UserDescription oldUserDescription = getUserDescription(currentUser.getCurrentUserId());
