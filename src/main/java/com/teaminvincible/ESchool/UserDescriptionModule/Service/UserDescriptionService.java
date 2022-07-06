@@ -13,6 +13,7 @@ import java.util.Set;
 @Service
 public interface UserDescriptionService {
 
+    UserDescription createUserDescription(UserDescription userDescription) throws CustomException;
     UserDescription updateUserDescription(UserDescription userDescription) throws CustomException;
 
     UserDescription getUserDescription(String userId) throws CustomException;
