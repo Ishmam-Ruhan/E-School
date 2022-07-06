@@ -1,4 +1,4 @@
-package com.teaminvincible.ESchool.AuthModule.Service.Security.JWT;
+package com.teaminvincible.ESchool.Security.JWT;
 
 import com.teaminvincible.ESchool.Configurations.AppConstants;
 import io.jsonwebtoken.Claims;

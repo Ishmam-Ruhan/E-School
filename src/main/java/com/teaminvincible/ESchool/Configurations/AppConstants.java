@@ -6,7 +6,7 @@ public class AppConstants {
     public static final String JWT_SECRET = "E+-+-+-+-*^*+-+-+-+-+-School+-+-+-+-*^*+-+-+-+-+-JavaFest+-+-+-+-*^*+-+-+-+-+-";
     public static final long JWT_Expiration = 1296000;
 
-    public static String[] UNAUTHORIZED_GETWAYS(){
+    public static String[] UNAUTHORIZED_GATEWAYS(){
 
         String[] endPoints = {
                 "/documentation/**",

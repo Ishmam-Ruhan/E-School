@@ -14,7 +14,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Configuration
 @OpenAPIDefinition(info = @Info(
         title = "E - School API Documentation",
-        description = "E-School is a project for THERAP JavaFest. This is a documentation for this projects available API"
+        description = "E-School is a project for THERAP JavaFest. This is a documentation for this projects available API\n\n" +
+                "All end-points are protected. To use this documentation:\n\n" +
+                "auth-controller -> REGISTER Endpoint -> register with all information's -> " +
+                "SIGN-IN endpoint -> sign in with credential\n\n" +
+                "Next you'll get the JWT token. Use this jwt token to authorize with 'bearer ' suffix."
 ))
 public class SwaggerConfig {
     @Bean
