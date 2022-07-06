@@ -1,8 +1,8 @@
-package com.teaminvincible.ESchool.Security.Configuration;
+package com.teaminvincible.ESchool.AuthModule.Service.Security.Configuration;
 
+import com.teaminvincible.ESchool.AuthModule.Service.Security.Filters.JwtFilter;
+import com.teaminvincible.ESchool.AuthModule.Service.Security.Services.CustomUserDetailsService;
 import com.teaminvincible.ESchool.Configurations.AppConstants;
-import com.teaminvincible.ESchool.Security.Filters.JwtFilter;
-import com.teaminvincible.ESchool.Security.Services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.teaminvincible.ESchool.Security.Services;
+package com.teaminvincible.ESchool.AuthModule.Service.Security.Services;
 
 import com.teaminvincible.ESchool.UserModule.Entity.User;
 import com.teaminvincible.ESchool.UserModule.Service.UserService;

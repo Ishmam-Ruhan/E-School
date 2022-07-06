@@ -3,4 +3,4 @@ spring:
     name: e-school
 
   profiles:
-    active: development
+    active: production

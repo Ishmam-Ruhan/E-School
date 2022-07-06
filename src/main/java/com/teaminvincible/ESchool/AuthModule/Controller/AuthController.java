@@ -48,7 +48,7 @@ public class AuthController {
                         HttpStatus.OK,
                         true,
                         "Sign In Success!",
-                        "Token: "+authService.signIn(userRequest)
+                        authService.signIn(userRequest)
                 ));
     }
 

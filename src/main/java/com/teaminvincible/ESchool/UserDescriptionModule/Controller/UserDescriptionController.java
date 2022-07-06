@@ -2,6 +2,7 @@ package com.teaminvincible.ESchool.UserDescriptionModule.Controller;
 
 import com.teaminvincible.ESchool.Annotations.GetAPI;
 import com.teaminvincible.ESchool.Annotations.PostAPI;
+import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
 import com.teaminvincible.ESchool.Output.Response;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
@@ -19,6 +20,9 @@ public class UserDescriptionController {
     @Autowired
     private UserDescriptionService userDescriptionService;
 
+    @Autowired
+    private CurrentUser currentUser;
+
     @Operation(
             summary = "Update existing user's description"
     )
@@ -34,7 +38,7 @@ public class UserDescriptionController {
     }
 
     @Operation(
-            summary = "Get a user's description by user-id"
+            summary = "Get user's description"
     )
     @GetAPI("/get-description")
     public ResponseEntity getUserDescription(){
@@ -43,12 +47,12 @@ public class UserDescriptionController {
                         HttpStatus.OK,
                         true,
                         "Successfully fetched user description",
-                        userDescriptionService.getUserDescription()
+                        userDescriptionService.getUserDescription(currentUser.getCurrentUserId())
                 ));
     }
 
     @Operation(
-            summary = "Get a user's role by user-id"
+            summary = "Get user's role"
     )
     @GetAPI("/get-role")
     public ResponseEntity getRoleFromUserDescription(){
@@ -62,9 +66,9 @@ public class UserDescriptionController {
     }
 
     @Operation(
-            summary = "Get courses by user-id"
+            summary = "Get All Courses"
     )
-    @GetAPI("/get-course")
+    @GetAPI("/get-courses")
     public ResponseEntity getCoursesOfAUser(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
@@ -76,9 +80,9 @@ public class UserDescriptionController {
     }
 
     @Operation(
-            summary = "Get tasks by user-id"
+            summary = "Get All Tasks"
     )
-    @GetAPI("/get-task")
+    @GetAPI("/get-tasks")
     public ResponseEntity getTasksOfAUser(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
@@ -90,7 +94,7 @@ public class UserDescriptionController {
     }
 
     @Operation(
-            summary = "Get meetings by user-id"
+            summary = "Get All Meetings"
     )
     @GetAPI("/get-meeting")
     public ResponseEntity getMeetingsOfAUser(){

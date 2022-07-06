@@ -1,15 +1,20 @@
 package com.teaminvincible.ESchool.Configurations.Master;
 
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
-import com.teaminvincible.ESchool.Security.Services.CustomUserDetails;
+import com.teaminvincible.ESchool.AuthModule.Service.Security.Services.CustomUserDetails;
+import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
+import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
+import com.teaminvincible.ESchool.UserModule.Entity.User;
 import com.teaminvincible.ESchool.UserModule.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Lazy
 public final class CurrentUser {
 
     private final UserService userService;
@@ -19,8 +24,8 @@ public final class CurrentUser {
         this.userService = userService;
     }
 
-
     public String getCurrentUserId(){
+
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if(authentication != null && authentication.isAuthenticated()){
@@ -31,7 +36,9 @@ public final class CurrentUser {
 
                 String userEmail = ((CustomUserDetails)principal).getEmail();
 
-                String userId = userService.getUserByEmail(userEmail).getUserId();
+                String email = userService.getUserByEmail(userEmail).getEmail();
+
+                String userId = this.userService.getUserByEmail(email).getUserId();
 
                 return userId;
             }else{

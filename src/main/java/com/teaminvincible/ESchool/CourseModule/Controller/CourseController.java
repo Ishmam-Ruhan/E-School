@@ -1,7 +1,6 @@
 package com.teaminvincible.ESchool.CourseModule.Controller;
 
 import com.teaminvincible.ESchool.Annotations.DeleteAPI;
-import com.teaminvincible.ESchool.Annotations.GetAPI;
 import com.teaminvincible.ESchool.Annotations.PostAPI;
 import com.teaminvincible.ESchool.Annotations.PutAPI;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
@@ -31,7 +30,7 @@ public class CourseController {
                    HttpStatus.CREATED,
                    true,
                    "Course created successfully.",
-                   courseService.createCourse(course.getCourseOwner().getUserId(), course)
+                   courseService.createCourse(course)
                 ));
     }
 
@@ -45,63 +44,49 @@ public class CourseController {
                         HttpStatus.OK,
                         true,
                         "Course updated successfully.",
-                        courseService.updateCourse(course.getCourseOwner().getUserId(), course)
+                        courseService.updateCourse(course)
                 ));
     }
 
     @Operation(
             summary = "Enroll a course."
     )
-    @PutAPI("/join-course/code/{joiningCode}/user/{userId}")
-    public ResponseEntity joinCourseByJoiningCode(@PathVariable String joiningCode, @PathVariable String userId){
+    @PutAPI("/join-course/code/{joiningCode}")
+    public ResponseEntity joinCourseByJoiningCode(@PathVariable String joiningCode){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
                         "Joined Course successfully.",
-                        courseService.joinCourse(userId,joiningCode)
+                        courseService.joinCourse(joiningCode)
                 ));
     }
 
     @Operation(
             summary = "Un-Enroll from a course."
     )
-    @PutAPI("/remove-course/course/{courseId}/user/{userId}")
-    public ResponseEntity unEnrollCourse(@PathVariable String courseId, @PathVariable String userId){
+    @DeleteAPI("/unenroll-course/course/{courseId}")
+    public ResponseEntity unEnrollCourse(@PathVariable String courseId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
                         "Un-Enrolled Course successfully.",
-                        courseService.unEnrollFromACourse(userId,courseId)
+                        courseService.unEnrollFromACourse(courseId)
                 ));
     }
 
     @Operation(
             summary = "Delete a course."
     )
-    @DeleteAPI("/delete-course/user/{userId}/course/{courseId}")
-    public ResponseEntity deleteCourse(@PathVariable String userId ,@PathVariable String courseId){
+    @DeleteAPI("/delete-course/course/{courseId}")
+    public ResponseEntity deleteCourse(@PathVariable String courseId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
                         "Course deleted successfully.",
-                        courseService.deleteCourse(userId, courseId)
-                ));
-    }
-
-    @Operation(
-            summary = "Get all courses of a user"
-    )
-    @GetAPI("/get-course/user/role/teacher/{teacherId}")
-    public ResponseEntity getAllCourseOfATeacher(@PathVariable String teacherId){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new Response<>(
-                        HttpStatus.OK,
-                        true,
-                        "All courses of user with id: "+teacherId+" fetched successfully!",
-                        courseService.getAllCourseOfATeacher(teacherId)
+                        courseService.deleteCourse(courseId)
                 ));
     }
 
