@@ -1,7 +1,7 @@
-package com.teaminvincible.ESchool.Security.Filters;
+package com.teaminvincible.ESchool.AuthModule.Service.Security.Filters;
 
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
-import com.teaminvincible.ESchool.Security.JWT.JwtGenerator;
+import com.teaminvincible.ESchool.AuthModule.Service.Security.JWT.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -1,5 +1,6 @@
 package com.teaminvincible.ESchool.CourseModule.ServiceImplementation;
 
+import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
 import com.teaminvincible.ESchool.CourseModule.DTO.CourseSearchCriteria;
 import com.teaminvincible.ESchool.CourseModule.DTO.CourseSpecification;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
@@ -31,6 +32,8 @@ public class CourseServiceImplementation implements CourseService {
     @Autowired
     private UserDescriptionService userDescriptionService;
 
+    @Autowired
+    private CurrentUser currentUser;
 
     public Course findCourseById(String courseId) throws CustomException{
 
@@ -41,9 +44,9 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course createCourse(String userId, Course course) throws CustomException {
+    public Course createCourse(Course course) throws CustomException {
 
-        UserDescription userDescription = userDescriptionService.getUserDescription();
+        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 
         if(userDescription.getRole() == Role.STUDENT)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a course! They can only join.");
@@ -65,8 +68,8 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course joinCourse(String userId, String joiningCode) throws CustomException {
-        UserDescription userDescription = userDescriptionService.getUserDescription();
+    public Course joinCourse(String joiningCode) throws CustomException {
+        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 
         if(userDescription.getRole() == Role.TEACHER)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Teachers are not allowed to join a course! They can only create course.");
@@ -90,14 +93,14 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public String unEnrollFromACourse(String userId, String courseId) throws CustomException {
+    public String unEnrollFromACourse(String courseId) throws CustomException {
 
         Course courseToRemove= findCourseById(courseId);
 
         if(Objects.isNull(courseToRemove))
             throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+courseId);
 
-        UserDescription userDescription = userDescriptionService.getUserDescription();
+        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 
         if(!userDescription.checkIfUserAlreadyEnrolledThisCourse(courseToRemove))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course.");
@@ -110,13 +113,13 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course updateCourse(String userId, Course course) throws CustomException {
+    public Course updateCourse(Course course) throws CustomException {
         Course oldCourse = findCourseById(course.getCourseId());
 
         if(Objects.isNull(oldCourse))
             throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+course.getCourseId());
 
-        if(!oldCourse.getCourseOwner().getUserId().equals(userId))
+        if(!oldCourse.getCourseOwner().getUserId().equals(currentUser.getCurrentUserId()))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the owner of this course.");
 
         Course updatedCourse = new Course();
@@ -125,18 +128,18 @@ public class CourseServiceImplementation implements CourseService {
 
         updatedCourse.setCourseId(oldCourse.getCourseId());
 
-        return createCourse(userId,updatedCourse);
+        return createCourse(updatedCourse);
     }
 
     @Override
-    public String deleteCourse(String userId, String courseId) throws CustomException {
+    public String deleteCourse(String courseId) throws CustomException {
 
         Course course = findCourseById(courseId);
 
         if(Objects.isNull(course))
             throw new CustomException(HttpStatus.BAD_REQUEST,"No course found with course-id: "+course.getCourseId());
 
-        if(!course.getCourseOwner().getUserId().equals(userId))
+        if(!course.getCourseOwner().getUserId().equals(currentUser.getCurrentUserId()))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the owner of this course.");
 
         try{
@@ -159,7 +162,7 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Set<Course> findCourse(String userId, CourseSearchCriteria searchCriteria) throws CustomException {
+    public Set<Course> findCourse(CourseSearchCriteria searchCriteria) throws CustomException {
         return null;
     }
 }

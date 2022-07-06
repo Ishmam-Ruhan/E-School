@@ -3,8 +3,9 @@ package com.teaminvincible.ESchool.AuthModule.ServiceImplementation;
 import com.teaminvincible.ESchool.AuthModule.DTO.CreateUserRequest;
 import com.teaminvincible.ESchool.AuthModule.DTO.SignInRequest;
 import com.teaminvincible.ESchool.AuthModule.Service.AuthService;
+import com.teaminvincible.ESchool.AuthModule.Service.Security.Services.CustomUserDetails;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
-import com.teaminvincible.ESchool.Security.JWT.JwtGenerator;
+import com.teaminvincible.ESchool.AuthModule.Service.Security.JWT.JwtGenerator;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserModule.Entity.User;
 import com.teaminvincible.ESchool.UserModule.Service.UserService;
@@ -80,13 +81,13 @@ public class AuthServiceImplementation implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(signInRequest.getEmail());
+        UserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
 
         String jwt = jwtGenerator.generateToken(userDetails);
 
         if(jwt == null)
             throw new CustomException(HttpStatus.BAD_REQUEST, "Something went wrong! Please try again.");
 
-        return jwt;
+        return "Your token: "+jwt;
     }
 }

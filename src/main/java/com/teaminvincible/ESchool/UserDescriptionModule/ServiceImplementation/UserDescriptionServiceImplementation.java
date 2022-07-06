@@ -39,7 +39,7 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     @Override
     public UserDescription updateUserDescription(UserDescription userDescription) throws CustomException {
 
-        UserDescription oldUserDescription = findUserDescriptionByUserId(userDescription.getUserId());
+        UserDescription oldUserDescription = getUserDescription(currentUser.getCurrentUserId());
 
         UserDescription updatedUserDescription = new UserDescription();
 
@@ -57,18 +57,18 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     }
 
     @Override
-    public UserDescription getUserDescription() throws CustomException {
-        return findUserDescriptionByUserId(currentUser.getCurrentUserId());
+    public UserDescription getUserDescription(String userId) throws CustomException {
+        return findUserDescriptionByUserId(userId);
     }
 
     @Override
     public Role getRoleFromUserDescription() throws CustomException {
-        return findUserDescriptionByUserId(currentUser.getCurrentUserId()).getRole();
+        return getUserDescription(currentUser.getCurrentUserId()).getRole();
     }
 
     @Override
     public Set<Course> getCoursesOfAUser() throws CustomException {
-        UserDescription userDescription = findUserDescriptionByUserId(currentUser.getCurrentUserId());
+        UserDescription userDescription = getUserDescription(currentUser.getCurrentUserId());
 
         if(userDescription.getRole().equals(Role.STUDENT))return userDescription.getCourses();
 
@@ -77,11 +77,11 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
 
     @Override
     public Set<Task> getTasksOfUser() throws CustomException {
-        return findUserDescriptionByUserId(currentUser.getCurrentUserId()).getTasks();
+        return getUserDescription(currentUser.getCurrentUserId()).getTasks();
     }
 
     @Override
     public Set<Meeting> getMeetingsOfUser() throws CustomException {
-        return findUserDescriptionByUserId(currentUser.getCurrentUserId()).getMeetings();
+        return getUserDescription(currentUser.getCurrentUserId()).getMeetings();
     }
 }
