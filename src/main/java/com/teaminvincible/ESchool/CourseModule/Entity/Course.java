@@ -40,11 +40,11 @@ public class Course implements Serializable {
 
     @OneToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinColumn(name = "courseOwnerId")
-    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings"})
+    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings","role"})
     private UserDescription courseOwner;
 
     @ManyToMany(mappedBy = "courses")
-    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings"})
+    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings","role"})
     private Set<UserDescription> students = new HashSet<>();
 
     @OneToMany(mappedBy = "course", cascade = {CascadeType.MERGE,CascadeType.PERSIST}, orphanRemoval = true)
