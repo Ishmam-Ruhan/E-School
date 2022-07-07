@@ -79,8 +79,8 @@ public class MeetingController {
             summary = "Get details of a meeting",
             description = "Need to pass a user-id as path variable."
     )
-    @GetAPI("/get-meeting/details/meeting/{meetingId}")
-    public ResponseEntity getDetailsofAmeeting(@PathVariable("meetingId") String meetingId){
+    @GetAPI("/get-details")
+    public ResponseEntity getDetailsofAmeeting(@RequestParam String meetingId){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new Response(

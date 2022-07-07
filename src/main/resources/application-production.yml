@@ -28,7 +28,7 @@ spring:
           order_inserts: true
     hibernate:
       ddl-auto: update
-    show-sql: true
+    #show-sql: true
 
 #OpenAPI Swagger-UI Custom Path
 springdoc:

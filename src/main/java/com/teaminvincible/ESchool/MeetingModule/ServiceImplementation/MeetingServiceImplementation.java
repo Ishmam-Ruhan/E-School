@@ -5,6 +5,7 @@ import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.DTO.CreateMeetingRequest;
+import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
 import com.teaminvincible.ESchool.MeetingModule.Repository.MeetingSpecification;
 import com.teaminvincible.ESchool.MeetingModule.DTO.UpdateMeetingRequest;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
@@ -12,11 +13,13 @@ import com.teaminvincible.ESchool.MeetingModule.Repository.MeetingRepository;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MeetingServiceImplementation implements MeetingService {
@@ -82,7 +85,7 @@ public class MeetingServiceImplementation implements MeetingService {
     }
 
     @Override
-    public Meeting updateMeeting(UpdateMeetingRequest updateMeetingRequest) throws CustomException {
+    public MeetingResponse updateMeeting(UpdateMeetingRequest updateMeetingRequest) throws CustomException {
 
         Meeting existingMeeting = findMeetingById(updateMeetingRequest.getMeetingId());
 
@@ -102,7 +105,10 @@ public class MeetingServiceImplementation implements MeetingService {
             throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process it right now. Please try again.");
         }
 
-        return existingMeeting;
+        MeetingResponse meetingResponse = new MeetingResponse();
+        BeanUtils.copyProperties(existingMeeting, meetingResponse);
+
+        return meetingResponse;
     }
 
     @Override
@@ -130,18 +136,30 @@ public class MeetingServiceImplementation implements MeetingService {
     }
 
     @Override
-    public Set<Meeting> getAllMeetingsOfACreator(String userId) throws CustomException {
-        Set<Meeting> resultSet = new HashSet<>();
-        resultSet.addAll(meetingRepository.findAll(MeetingSpecification.searchByMeetingUserId(userId)));
+    public Set<MeetingResponse> getAllMeetingsOfACreator(String userId) throws CustomException {
 
-        return resultSet;
+        return meetingRepository
+                .findAll(MeetingSpecification.searchByMeetingUserId(userId))
+                .stream()
+                .map(meeting -> {
+                    MeetingResponse meetingResponse = new MeetingResponse();
+                    BeanUtils.copyProperties(meeting, meetingResponse);
+                    return meetingResponse;
+                })
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<Meeting> getAllMeetingOfACourse(String courseId) throws CustomException {
-        Set<Meeting> resultSet = new HashSet<>();
-        resultSet.addAll(meetingRepository.findAll(MeetingSpecification.searchByMeetingCourseId(courseId)));
+    public Set<MeetingResponse> getAllMeetingOfACourse(String courseId) throws CustomException {
 
-        return resultSet;
+        return meetingRepository
+                .findAll(MeetingSpecification.searchByMeetingCourseId(courseId))
+                .stream()
+                .map(meeting -> {
+                    MeetingResponse meetingResponse = new MeetingResponse();
+                    BeanUtils.copyProperties(meeting, meetingResponse);
+                    return meetingResponse;
+                })
+                .collect(Collectors.toSet());
     }
 }

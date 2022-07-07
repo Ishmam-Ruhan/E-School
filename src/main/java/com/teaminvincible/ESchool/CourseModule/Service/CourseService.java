@@ -5,6 +5,7 @@ import com.teaminvincible.ESchool.CourseModule.DTO.CreateCourseRequest;
 import com.teaminvincible.ESchool.CourseModule.DTO.UpdateCourseRequest;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public interface CourseService {
     String deleteCourse(String courseId) throws CustomException;
 
     Set<Course> getAllCourseOfATeacher(String userId) throws CustomException;
-    Set<Meeting> getAllMeetingsOfCourse(String courseId) throws CustomException;
+    Set<MeetingResponse> getAllMeetingsOfCourse(String courseId) throws CustomException;
 
     Set<TaskResponse> getAllTasksOfACourse(String courseId) throws CustomException;
     Set<Course> findCourse(CourseSearchCriteria searchCriteria) throws CustomException;

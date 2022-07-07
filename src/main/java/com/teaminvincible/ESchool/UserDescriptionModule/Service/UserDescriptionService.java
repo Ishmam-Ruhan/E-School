@@ -3,6 +3,7 @@ package com.teaminvincible.ESchool.UserDescriptionModule.Service;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
 import com.teaminvincible.ESchool.TaskModule.Entity.Task;
@@ -25,7 +26,7 @@ public interface UserDescriptionService {
 
     Set<TaskResponse> getTasksOfUser() throws CustomException;
 
-    Set<Meeting> getMeetingsOfUser() throws CustomException;
+    Set<MeetingResponse> getMeetingsOfUser() throws CustomException;
 
     void saveMeetingToUsers(Set<UserDescription> students, Meeting meeting) throws CustomException;
 

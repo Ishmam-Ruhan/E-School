@@ -56,22 +56,22 @@ public class CourseController {
     @Operation(
             summary = "Enroll a course."
     )
-    @PutAPI("/join-course/code/{joiningCode}")
-    public ResponseEntity joinCourseByJoiningCode(@PathVariable String joiningCode){
+    @PutAPI("/join-course")
+    public ResponseEntity joinCourseByJoiningCode(@RequestParam String joinCode){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
                         "Joined Course successfully.",
-                        courseService.joinCourse(joiningCode)
+                        courseService.joinCourse(joinCode)
                 ));
     }
 
     @Operation(
             summary = "Un-Enroll from a course."
     )
-    @DeleteAPI("/unenroll-course/course/{courseId}")
-    public ResponseEntity unEnrollCourse(@PathVariable String courseId){
+    @DeleteAPI("/unenroll-course")
+    public ResponseEntity unEnrollCourse(@RequestParam String courseId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
@@ -84,8 +84,8 @@ public class CourseController {
     @Operation(
             summary = "Get all meetings of a enrolled course."
     )
-    @GetAPI("/get-meetings/course/{courseId}")
-    public ResponseEntity getMeetings(@PathVariable String courseId){
+    @GetAPI("/get-meetings")
+    public ResponseEntity getMeetings(@RequestParam String courseId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
@@ -98,8 +98,8 @@ public class CourseController {
     @Operation(
             summary = "Get all tasks of a enrolled course."
     )
-    @GetAPI("/get-tasks/course/{courseId}")
-    public ResponseEntity getTasks(@PathVariable String courseId){
+    @GetAPI("/get-tasks")
+    public ResponseEntity getTasks(@RequestParam String courseId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,
@@ -112,8 +112,8 @@ public class CourseController {
     @Operation(
             summary = "Delete a course."
     )
-    @DeleteAPI("/delete-course/course/{courseId}")
-    public ResponseEntity deleteCourse(@PathVariable String courseId){
+    @DeleteAPI("/delete-course")
+    public ResponseEntity deleteCourse(@RequestParam String courseId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response<>(
                         HttpStatus.OK,

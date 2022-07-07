@@ -11,6 +11,7 @@ import com.teaminvincible.ESchool.CourseModule.Repository.CourseRepository;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
@@ -172,7 +173,7 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Set<Meeting> getAllMeetingsOfCourse(String courseId) throws CustomException {
+    public Set<MeetingResponse> getAllMeetingsOfCourse(String courseId) throws CustomException {
         Course course = findCourseById(courseId);
         UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
 

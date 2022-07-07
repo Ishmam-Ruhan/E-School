@@ -5,6 +5,7 @@ import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
+import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
@@ -118,11 +119,18 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     }
 
     @Override
-    public Set<Meeting> getMeetingsOfUser() throws CustomException {
+    public Set<MeetingResponse> getMeetingsOfUser() throws CustomException {
         UserDescription userDescription = findUserDescriptionByUserId(currentUser.getCurrentUserId());
 
         if(userDescription.getRole().equals(Role.STUDENT))
-            return userDescription.getMeetings();
+            return userDescription.getMeetings()
+                    .stream()
+                    .map(meeting -> {
+                        MeetingResponse response = new MeetingResponse();
+                        BeanUtils.copyProperties(meeting, response);
+                        return response;
+                    })
+                    .collect(Collectors.toSet());
 
         return meetingService.getAllMeetingsOfACreator(userDescription.getUserId());
     }
