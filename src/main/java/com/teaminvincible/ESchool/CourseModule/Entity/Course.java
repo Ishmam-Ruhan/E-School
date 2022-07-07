@@ -85,10 +85,12 @@ public class Course implements Serializable {
         this.students.forEach(student -> {
             student.removeCourse(this);
         });
-//        this.tasks.forEach(task -> {
-//            task.removeCourse(this);
-//        });
-        this.meetings = new HashSet<>();
+        this.tasks.forEach(task -> {
+            task.removeCourse(this);
+        });
+        this.meetings.forEach(meeting -> {
+            meeting.removeCourse(this);
+        });
     }
 
     public void removeUserDescription(UserDescription userDescription){

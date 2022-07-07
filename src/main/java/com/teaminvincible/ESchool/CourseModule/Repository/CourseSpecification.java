@@ -1,4 +1,4 @@
-package com.teaminvincible.ESchool.CourseModule.DTO;
+package com.teaminvincible.ESchool.CourseModule.Repository;
 
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import org.springframework.data.jpa.domain.Specification;

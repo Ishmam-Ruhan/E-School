@@ -1,4 +1,4 @@
-package com.teaminvincible.ESchool.MeetingModule.DTO;
+package com.teaminvincible.ESchool.MeetingModule.Repository;
 
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import org.springframework.data.jpa.domain.Specification;

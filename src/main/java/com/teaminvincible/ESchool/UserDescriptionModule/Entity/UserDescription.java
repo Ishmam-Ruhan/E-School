@@ -176,6 +176,11 @@ public class UserDescription implements Serializable {
         meeting.getParticipants().remove(this);
     }
 
+    public void removeTaskFromUser(Task task){
+        this.tasks.remove(task);
+        task.getAssignedStudents().remove(this);
+    }
+
     public Boolean checkIfUserAlreadyEnrolledThisCourse(Course course){
         return this.getCourses().contains(course);
     }
