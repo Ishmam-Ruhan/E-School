@@ -2,10 +2,8 @@ package com.teaminvincible.ESchool.MeetingModule.Service;
 
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.DTO.CreateMeetingRequest;
-import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingSearchCriteria;
 import com.teaminvincible.ESchool.MeetingModule.DTO.UpdateMeetingRequest;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
-import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +18,8 @@ public interface MeetingService {
 
     String deleteMeeting(String meetingId) throws CustomException;
 
-    String deleteCollectionOfMeeting(List<String> meetingIds) throws CustomException;
-
     Meeting getMeetingDetails(String meetingId) throws CustomException;
+
     Set<Meeting> getAllMeetingsOfACreator(String userId) throws CustomException;
 
     Set<Meeting> getAllMeetingOfACourse(String courseId) throws CustomException;

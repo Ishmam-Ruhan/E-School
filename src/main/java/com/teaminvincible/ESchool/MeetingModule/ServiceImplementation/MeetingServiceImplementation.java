@@ -2,19 +2,16 @@ package com.teaminvincible.ESchool.MeetingModule.ServiceImplementation;
 
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
-import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.DTO.CreateMeetingRequest;
-import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingSearchCriteria;
-import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingSpecification;
+import com.teaminvincible.ESchool.MeetingModule.Repository.MeetingSpecification;
 import com.teaminvincible.ESchool.MeetingModule.DTO.UpdateMeetingRequest;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Repository.MeetingRepository;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -128,22 +125,12 @@ public class MeetingServiceImplementation implements MeetingService {
     }
 
     @Override
-    public String deleteCollectionOfMeeting(List<String> meetingIds) throws CustomException {
-        for(String id : meetingIds){
-            deleteMeeting(id);
-        }
-        return "Successfully deleted all meetings!";
-    }
-
-
-    @Override
     public Meeting getMeetingDetails(String meetingId) throws CustomException {
         return findMeetingById(meetingId);
     }
 
     @Override
     public Set<Meeting> getAllMeetingsOfACreator(String userId) throws CustomException {
-
         Set<Meeting> resultSet = new HashSet<>();
         resultSet.addAll(meetingRepository.findAll(MeetingSpecification.searchByMeetingUserId(userId)));
 
@@ -157,10 +144,4 @@ public class MeetingServiceImplementation implements MeetingService {
 
         return resultSet;
     }
-
-//    @Override
-//    public Set<Meeting> getAllMeetingsFromCourse(String courseId) throws CustomException {
-//        return (Set<Meeting>) meetingRepository.findAll(MeetingSpecification.searchByMeetingCourseId(courseId));
-//    }
-
 }

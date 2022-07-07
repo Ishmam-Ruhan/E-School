@@ -7,7 +7,9 @@ import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
+import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
 import com.teaminvincible.ESchool.TaskModule.Entity.Task;
+import com.teaminvincible.ESchool.TaskModule.Service.TaskService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Repository.UserDescriptionRepository;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -31,6 +34,9 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
 
     @Autowired
     private MeetingService meetingService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private CurrentUser currentUser;
@@ -95,8 +101,20 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     }
 
     @Override
-    public Set<Task> getTasksOfUser() throws CustomException {
-        return getUserDescription(currentUser.getCurrentUserId()).getTasks();
+    public Set<TaskResponse> getTasksOfUser() throws CustomException {
+        UserDescription userDescription = findUserDescriptionByUserId(currentUser.getCurrentUserId());
+
+        if(userDescription.getRole().equals(Role.STUDENT))
+            return userDescription.getTasks()
+                    .stream()
+                    .map(task -> {
+                        TaskResponse taskResponse = new TaskResponse();
+                        BeanUtils.copyProperties(task,taskResponse);
+                        return taskResponse;
+                    })
+                    .collect(Collectors.toSet());
+
+        return taskService.getTasksOfACourseOwner(userDescription.getUserId());
     }
 
     @Override
@@ -123,4 +141,21 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
             throw new CustomException(HttpStatus.BAD_REQUEST, "Something went wrong! Please try again.");
         }
     }
+
+    @Override
+    public void saveTasksToUsers(Set<UserDescription> students, Task newTask) throws CustomException {
+        try{
+            students.forEach(
+                    student -> {
+                        Set<Task> taskSet = student.getTasks();
+                        taskSet.add(newTask);
+                        userDescriptionRepository.save(student);
+                    }
+            );
+        }catch (Exception ex){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Something went wrong! Please try again.");
+        }
+    }
+
+
 }

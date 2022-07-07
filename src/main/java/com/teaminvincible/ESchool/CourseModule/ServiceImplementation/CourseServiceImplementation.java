@@ -1,5 +1,6 @@
 package com.teaminvincible.ESchool.CourseModule.ServiceImplementation;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
 import com.teaminvincible.ESchool.CourseModule.DTO.CourseSearchCriteria;
 import com.teaminvincible.ESchool.CourseModule.DTO.CourseSpecification;
@@ -12,6 +13,8 @@ import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
+import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
+import com.teaminvincible.ESchool.TaskModule.Service.TaskService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
 import com.teaminvincible.ESchool.Utility.CodeGenerator;
@@ -37,6 +40,9 @@ public class CourseServiceImplementation implements CourseService {
 
     @Autowired
     private MeetingService meetingService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private CurrentUser currentUser;
@@ -185,6 +191,11 @@ public class CourseServiceImplementation implements CourseService {
 
 
         return meetingService.getAllMeetingOfACourse(courseId);
+    }
+
+    @Override
+    public Set<TaskResponse> getAllTasksOfACourse(String courseId) throws CustomException {
+        return taskService.getTasksOfACourse(courseId);
     }
 
     @Override

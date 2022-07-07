@@ -4,6 +4,7 @@ import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
+import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
 import com.teaminvincible.ESchool.TaskModule.Entity.Task;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,11 @@ public interface UserDescriptionService {
 
     Set<Course> getCoursesOfAUser() throws CustomException;
 
-    Set<Task> getTasksOfUser() throws CustomException;
+    Set<TaskResponse> getTasksOfUser() throws CustomException;
 
     Set<Meeting> getMeetingsOfUser() throws CustomException;
 
     void saveMeetingToUsers(Set<UserDescription> students, Meeting meeting) throws CustomException;
+
+    void saveTasksToUsers(Set<UserDescription> students, Task newTask) throws CustomException;
 }

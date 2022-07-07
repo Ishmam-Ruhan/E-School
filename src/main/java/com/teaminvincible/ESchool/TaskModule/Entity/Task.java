@@ -22,7 +22,7 @@ public class Task implements Serializable {
     @Id
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-    @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
+    @Column(unique = true,length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
     private String taskId;
 
     private String taskTitle;
@@ -30,44 +30,44 @@ public class Task implements Serializable {
     private String taskDetails;
 
     /**
-     *  Task Image should be added
+     *  Task Images should be added
      */
 
     @ManyToMany(mappedBy = "tasks")
     @JsonIgnoreProperties(value = {"courses","user","tasks","meetings"})
-    private Set<UserDescription> users = new HashSet<>();
+    private Set<UserDescription> assignedStudents = new HashSet<>();
 
     @OneToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    @JoinColumn(name = "courseOwnerId")
-    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings"})
-    private UserDescription createdByTeacher;
+    @JoinColumn(name = "taskOwnerId")
+    @JsonIgnoreProperties(value = {"courses","user","tasks","meetings","role"})
+    private UserDescription createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
-    @JsonIgnoreProperties(value = {"courseOwner","students","tasks","meetings"})
+    @JsonIgnoreProperties(value = {"courseOwner","students","tasks","meetings","courseJoiningCode","courseSubTitle","createdDate"})
     private Course course;
 
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     private Date dueDate;
 
     private Boolean isClosed;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     @Column(nullable = false,updatable = false)
     private Date assignedOn;
 
     public Task() {
     }
 
-    public Task(String taskId, String taskTitle, String taskDetails, Set<UserDescription> users, UserDescription createdByTeacher, Course course, Date dueDate, Boolean isClosed, Date assignedOn) {
+    public Task(String taskId, String taskTitle, String taskDetails, Set<UserDescription> assignedStudents, UserDescription createdBy, Course course, Date dueDate, Boolean isClosed, Date assignedOn) {
         this.taskId = taskId;
         this.taskTitle = taskTitle;
         this.taskDetails = taskDetails;
-        this.users = users;
-        this.createdByTeacher = createdByTeacher;
+        this.assignedStudents = assignedStudents;
+        this.createdBy = createdBy;
         this.course = course;
         this.dueDate = dueDate;
         this.isClosed = isClosed;
@@ -85,6 +85,15 @@ public class Task implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getTaskId());
+    }
+
+    @PreRemove
+    public void beforeRemovingEntity(){
+        this.assignedStudents.forEach(userDescription -> {
+            userDescription.removeTaskFromUser(this);
+        });
+        this.createdBy  = null;
+        this.course = null;
     }
 
     public String getTaskId() {
@@ -111,20 +120,20 @@ public class Task implements Serializable {
         this.taskDetails = taskDetails;
     }
 
-    public Set<UserDescription> getUsers() {
-        return users;
+    public Set<UserDescription> getAssignedStudents() {
+        return assignedStudents;
     }
 
-    public void setUsers(Set<UserDescription> users) {
-        this.users = users;
+    public void setAssignedStudents(Set<UserDescription> assignedStudents) {
+        this.assignedStudents = assignedStudents;
     }
 
-    public UserDescription getCreatedByTeacher() {
-        return createdByTeacher;
+    public UserDescription getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreatedByTeacher(UserDescription createdByTeacher) {
-        this.createdByTeacher = createdByTeacher;
+    public void setCreatedBy(UserDescription createdByTeacher) {
+        this.createdBy = createdByTeacher;
     }
 
     public Course getCourse() {
@@ -159,18 +168,4 @@ public class Task implements Serializable {
         this.assignedOn = assignedOn;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "taskId='" + taskId + '\'' +
-                ", taskTitle='" + taskTitle + '\'' +
-                ", taskDetails='" + taskDetails + '\'' +
-                ", users=" + users +
-                ", createdByTeacher=" + createdByTeacher +
-                ", course=" + course +
-                ", dueDate=" + dueDate +
-                ", isClosed=" + isClosed +
-                ", assignedOn=" + assignedOn +
-                '}';
-    }
 }

@@ -1,5 +1,6 @@
 package com.teaminvincible.ESchool.MeetingModule.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
@@ -22,7 +23,7 @@ public class Meeting implements Serializable {
     @Id
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-    @Column(length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
+    @Column(unique = true,length = 36,columnDefinition = "VARCHAR(255)", nullable = false, updatable = false)
     private String meetingId;
 
     private String meetingTitle;

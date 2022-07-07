@@ -90,8 +90,22 @@ public class CourseController {
                 .body(new Response<>(
                         HttpStatus.OK,
                         true,
-                        "Un-Enrolled Course successfully.",
+                        "Fetched all meetings successfully.",
                         courseService.getAllMeetingsOfCourse(courseId)
+                ));
+    }
+
+    @Operation(
+            summary = "Get all tasks of a enrolled course."
+    )
+    @GetAPI("/get-tasks/course/{courseId}")
+    public ResponseEntity getTasks(@PathVariable String courseId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response<>(
+                        HttpStatus.OK,
+                        true,
+                        "Fetched all taskssuccessfully.",
+                        courseService.getAllTasksOfACourse(courseId)
                 ));
     }
 
