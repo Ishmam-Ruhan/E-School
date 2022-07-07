@@ -11,6 +11,7 @@ import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
+import com.teaminvincible.ESchool.TaskModule.Entity.Task;
 import com.teaminvincible.ESchool.TaskModule.Service.TaskService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
@@ -98,10 +99,9 @@ public class CourseServiceImplementation implements CourseService {
         if(userDescription.checkIfUserAlreadyEnrolledThisCourse(course))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! Already enrolled in this course.");
 
-        Set<Course> courses = userDescription.getCourses();
-        courses.add(course);
-
-        userDescription.setCourses(courses);
+        userDescription.addCourses(Set.of(course));
+        userDescription.addTasks(course.getTasks());
+        userDescription.addMeetings(course.getMeetings());
 
         userDescriptionService.updateUserDescription(userDescription);
 
@@ -122,7 +122,9 @@ public class CourseServiceImplementation implements CourseService {
         if(!userDescription.checkIfUserAlreadyEnrolledThisCourse(courseToRemove))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course.");
 
-        userDescription.removeCourse(courseToRemove);
+        userDescription.removeCourses(Set.of(courseToRemove));
+        userDescription.removeTasks(courseToRemove.getTasks());
+        userDescription.removeMeetings(courseToRemove.getMeetings());
 
         userDescriptionService.updateUserDescription(userDescription);
 

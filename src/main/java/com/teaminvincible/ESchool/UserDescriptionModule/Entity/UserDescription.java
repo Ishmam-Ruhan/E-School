@@ -185,15 +185,27 @@ public class UserDescription implements Serializable {
         return this.getCourses().contains(course);
     }
 
-    @Override
-    public String toString() {
-        return "UserDescription{" +
-                "userId='" + userId + '\'' +
-                ", name='" + name + '\'' +
-                ", role=" + role +
-                ", courses=" + courses +
-                ", tasks=" + tasks +
-                ", meetings=" + meetings +
-                '}';
+    public void addCourses(Set<Course> newCourses){
+        this.courses.addAll(newCourses);
+    }
+
+    public void addTasks(Set<Task> tasks){
+        this.tasks.addAll(tasks);
+    }
+
+    public void addMeetings(Set<Meeting> meetings){
+        this.meetings.addAll(meetings);
+    }
+
+    public void removeCourses(Set<Course> newCourses){
+        this.courses.removeAll(newCourses);
+    }
+
+    public void removeTasks(Set<Task> tasks){
+        this.tasks.removeAll(tasks);
+    }
+
+    public void removeMeetings(Set<Meeting> meetings){
+        this.meetings.removeAll(meetings);
     }
 }
