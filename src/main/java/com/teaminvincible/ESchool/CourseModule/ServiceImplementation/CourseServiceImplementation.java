@@ -1,33 +1,30 @@
 package com.teaminvincible.ESchool.CourseModule.ServiceImplementation;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
-import com.teaminvincible.ESchool.CourseModule.DTO.CourseSearchCriteria;
-import com.teaminvincible.ESchool.CourseModule.DTO.CourseSpecification;
-import com.teaminvincible.ESchool.CourseModule.DTO.CreateCourseRequest;
-import com.teaminvincible.ESchool.CourseModule.DTO.UpdateCourseRequest;
+import com.teaminvincible.ESchool.CourseModule.DTO.*;
+import com.teaminvincible.ESchool.CourseModule.Repository.CourseSpecification;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.CourseModule.Repository.CourseRepository;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.DTO.MeetingResponse;
-import com.teaminvincible.ESchool.MeetingModule.Entity.Meeting;
 import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
 import com.teaminvincible.ESchool.TaskModule.Service.TaskService;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
 import com.teaminvincible.ESchool.Utility.CodeGenerator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -57,9 +54,9 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course createCourse(CreateCourseRequest courseRequest) throws CustomException {
+    public CourseResponse createCourse(CreateCourseRequest courseRequest) throws CustomException {
 
-        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole() == Role.STUDENT)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a course! They can only join.");
@@ -79,12 +76,16 @@ public class CourseServiceImplementation implements CourseService {
             throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process the request right now! Please try again.");
         }
 
-        return course;
+        CourseResponse courseResponse
+                = new CourseResponse();
+        BeanUtils.copyProperties(course,courseResponse);
+
+        return courseResponse;
     }
 
     @Override
-    public Course joinCourse(String joiningCode) throws CustomException {
-        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+    public CourseResponse joinCourse(String joiningCode) throws CustomException {
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole() == Role.TEACHER)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Teachers are not allowed to join a course! They can only create course.");
@@ -104,7 +105,11 @@ public class CourseServiceImplementation implements CourseService {
 
         userDescriptionService.updateUserDescription(userDescription);
 
-        return course;
+        CourseResponse courseResponseForStudent
+                = new CourseResponse();
+        BeanUtils.copyProperties(course,courseResponseForStudent);
+
+        return courseResponseForStudent;
     }
 
     @Override
@@ -112,7 +117,7 @@ public class CourseServiceImplementation implements CourseService {
 
         Course courseToRemove= findCourseById(courseId);
 
-        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(!userDescription.checkIfUserAlreadyEnrolledThisCourse(courseToRemove))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course.");
@@ -125,7 +130,7 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Course updateCourse(UpdateCourseRequest updateCourseRequest) throws CustomException {
+    public CourseResponse updateCourse(UpdateCourseRequest updateCourseRequest) throws CustomException {
         Course originalCourse = findCourseById(updateCourseRequest.getCourseId());
 
         if(Objects.isNull(originalCourse))
@@ -142,7 +147,12 @@ public class CourseServiceImplementation implements CourseService {
         }catch (Exception ex){
             throw new CustomException(HttpStatus.BAD_REQUEST, "Can't Process the request right now!");
         }
-        return originalCourse;
+
+        CourseResponse courseResponse
+                = new CourseResponse();
+        BeanUtils.copyProperties(originalCourse,courseResponse);
+
+        return courseResponse;
     }
 
     @Override
@@ -163,19 +173,24 @@ public class CourseServiceImplementation implements CourseService {
     }
 
     @Override
-    public Set<Course> getAllCourseOfATeacher(String userId) throws CustomException {
+    public Set<CourseResponse> getAllCourseOfATeacher(String userId) throws CustomException {
 
-        Set<Course> courseSet = new HashSet<>();
+     return courseRepository.findAll(CourseSpecification.findCourseByCourseOwner(userId))
+             .stream()
+             .map(course -> {
+                 CourseResponse courseResponseForTeacher
+                         = new CourseResponse();
+                 BeanUtils.copyProperties(course, courseResponseForTeacher);
+                 return courseResponseForTeacher;
+             })
+             .collect(Collectors.toSet());
 
-        courseSet.addAll( courseRepository.findAll(CourseSpecification.findCourseByCourseOwner(userId)));
-
-        return courseSet;
     }
 
     @Override
     public Set<MeetingResponse> getAllMeetingsOfCourse(String courseId) throws CustomException {
         Course course = findCourseById(courseId);
-        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole().equals(Role.STUDENT)){
             Optional<UserDescription> enrolled = course.getStudents().stream()
@@ -196,11 +211,49 @@ public class CourseServiceImplementation implements CourseService {
 
     @Override
     public Set<TaskResponse> getAllTasksOfACourse(String courseId) throws CustomException {
+        Course course = findCourseById(courseId);
+        UserDescription userDescription = userDescriptionService.getUserDescription();
+
+        if(userDescription.getRole().equals(Role.STUDENT)){
+            Optional<UserDescription> enrolled = course.getStudents().stream()
+                    .filter(student -> student.getUserId().equals(currentUser.getCurrentUserId()))
+                    .findFirst();
+
+            if(enrolled.isEmpty())
+                throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course!");
+        }
+
+        else if(!userDescription.getUserId().equals(course.getCourseOwner().getUserId())){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not the authority of this course!");
+        }
+
         return taskService.getTasksOfACourse(courseId);
+    }
+
+    @Override
+    public Course getCourseDetails(String courseId) {
+        Course course = findCourseById(courseId);
+        UserDescription userDescription = userDescriptionService.getUserDescription();
+
+        if(userDescription.getRole().equals(Role.STUDENT)){
+            Optional<UserDescription> enrolled = course.getStudents().stream()
+                    .filter(student -> student.getUserId().equals(currentUser.getCurrentUserId()))
+                    .findFirst();
+
+            if(enrolled.isEmpty())
+                throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not enrolled in this course!");
+        }
+
+        else if(!userDescription.getUserId().equals(course.getCourseOwner().getUserId())){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Opps! You're not the authority of this course!");
+        }
+
+        return course;
     }
 
     @Override
     public Set<Course> findCourse(CourseSearchCriteria searchCriteria) throws CustomException {
         return null;
     }
+
 }

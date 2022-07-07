@@ -168,4 +168,8 @@ public class Task implements Serializable {
         this.assignedOn = assignedOn;
     }
 
+    public void removeCourse(Course course){
+        this.course = null;
+        course.getTasks().remove(this);
+    }
 }

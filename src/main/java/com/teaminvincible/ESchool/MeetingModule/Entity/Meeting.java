@@ -33,11 +33,9 @@ public class Meeting implements Serializable {
     private String meetingAvailableLink;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     private Date startTime;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
     private Date endTime;
 
     @ManyToMany(mappedBy = "meetings")
@@ -203,21 +201,8 @@ public class Meeting implements Serializable {
         this.createdAt = createdAt;
     }
 
-    @Override
-    public String toString() {
-        return "Meeting{" +
-                "meetingId='" + meetingId + '\'' +
-                ", meetingTitle='" + meetingTitle + '\'' +
-                ", meetingAgenda='" + meetingAgenda + '\'' +
-                ", meetingDescription='" + meetingDescription + '\'' +
-                ", meetingAvailableLink='" + meetingAvailableLink + '\'' +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", participants=" + participants +
-                ", createdBy=" + createdBy +
-                ", course=" + course +
-                ", isClosed=" + isClosed +
-                ", createdAt=" + createdAt +
-                '}';
+    public void removeCourse(Course course){
+        this.course = null;
+        course.getTasks().remove(this);
     }
 }

@@ -1,6 +1,7 @@
 package com.teaminvincible.ESchool.TaskModule.ServiceImplementation;
 
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
+import com.teaminvincible.ESchool.CourseModule.DTO.CourseResponse;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
@@ -20,7 +21,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,6 +38,9 @@ public class TaskServiceImplementations implements TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private CourseService courseService;
+
     private Task findTaskById(String taskId){
         Optional<Task> task = taskRepository.findById(taskId);
 
@@ -49,12 +52,12 @@ public class TaskServiceImplementations implements TaskService {
     @Override
     public Task createTask(String courseId, CreateTaskRequest createTaskRequest) throws CustomException {
 
-        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole() == Role.STUDENT)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create task!");
 
-        Optional<Course> targetCourse = userDescriptionService.getCoursesOfAUser().stream()
+        Optional<CourseResponse> targetCourse = userDescriptionService.getCoursesOfAUser().stream()
                 .filter(course -> course.getCourseId().equals(courseId))
                 .findFirst();
 
@@ -67,7 +70,7 @@ public class TaskServiceImplementations implements TaskService {
             newTask.setTaskDetails(createTaskRequest.getTaskDetails());
             newTask.setDueDate(createTaskRequest.getDueDate());
 
-            newTask.setCourse(targetCourse.get());
+            newTask.setCourse(courseService.getCourseDetails(courseId));
             newTask.setCreatedBy(userDescription);
 
         try{
@@ -76,7 +79,7 @@ public class TaskServiceImplementations implements TaskService {
             throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process your request right now! Please try again.");
         }
 
-        userDescriptionService.saveTasksToUsers(targetCourse.get().getStudents(), newTask);
+        userDescriptionService.saveTasksToUsers(courseService.getCourseDetails(courseId).getStudents(), newTask);
 
         return newTask;
     }
@@ -106,7 +109,7 @@ public class TaskServiceImplementations implements TaskService {
     public String deleteTask(String taskId) throws CustomException {
         Task taskToRemove = findTaskById(taskId);
 
-        UserDescription currentUserDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription currentUserDescription = userDescriptionService.getUserDescription();
 
         if(!taskToRemove.getCreatedBy().getUserId().equals(currentUserDescription.getUserId()))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the creator of the task.");

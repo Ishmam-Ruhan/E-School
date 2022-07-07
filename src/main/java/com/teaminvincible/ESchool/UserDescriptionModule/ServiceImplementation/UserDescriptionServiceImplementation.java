@@ -1,7 +1,7 @@
 package com.teaminvincible.ESchool.UserDescriptionModule.ServiceImplementation;
 
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
-import com.teaminvincible.ESchool.CourseModule.Entity.Course;
+import com.teaminvincible.ESchool.CourseModule.DTO.CourseResponse;
 import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
@@ -11,6 +11,7 @@ import com.teaminvincible.ESchool.MeetingModule.Service.MeetingService;
 import com.teaminvincible.ESchool.TaskModule.DTO.TaskResponse;
 import com.teaminvincible.ESchool.TaskModule.Entity.Task;
 import com.teaminvincible.ESchool.TaskModule.Service.TaskService;
+import com.teaminvincible.ESchool.UserDescriptionModule.DTO.UserDescriptionResponse;
 import com.teaminvincible.ESchool.UserDescriptionModule.Entity.UserDescription;
 import com.teaminvincible.ESchool.UserDescriptionModule.Repository.UserDescriptionRepository;
 import com.teaminvincible.ESchool.UserDescriptionModule.Service.UserDescriptionService;
@@ -43,8 +44,10 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     private CurrentUser currentUser;
 
     public UserDescription findUserDescriptionByUserId(String userId) throws CustomException{
-        return userDescriptionRepository.findByuserId(userId)
+        UserDescription userDescription =  userDescriptionRepository.findByuserId(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "No User Description Found With Id: "+userId));
+
+        return userDescription;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     @Override
     public UserDescription updateUserDescription(UserDescription userDescription) throws CustomException {
 
-        UserDescription oldUserDescription = getUserDescription(currentUser.getCurrentUserId());
+        UserDescription oldUserDescription = getUserDescription();
 
         UserDescription updatedUserDescription = new UserDescription();
 
@@ -83,20 +86,45 @@ public class UserDescriptionServiceImplementation implements UserDescriptionServ
     }
 
     @Override
-    public UserDescription getUserDescription(String userId) throws CustomException {
-        return findUserDescriptionByUserId(userId);
+    public UserDescription getUserDescription() throws CustomException {
+        return findUserDescriptionByUserId(currentUser.getCurrentUserId());
+    }
+
+    @Override
+    public UserDescriptionResponse getMinimalUserDescription() throws CustomException {
+        UserDescription userDescription = getUserDescription();
+
+        UserDescriptionResponse userDescriptionResponse
+                = new UserDescriptionResponse();
+
+            BeanUtils.copyProperties(userDescription, userDescriptionResponse);
+
+            userDescriptionResponse.setCourses(this.getCoursesOfAUser());
+            userDescriptionResponse.setMeetings(this.getMeetingsOfUser());
+            userDescriptionResponse.setTasks(this.getTasksOfUser());
+
+        return userDescriptionResponse;
     }
 
     @Override
     public Role getRoleFromUserDescription() throws CustomException {
-        return getUserDescription(currentUser.getCurrentUserId()).getRole();
+        return getUserDescription().getRole();
     }
 
     @Override
-    public Set<Course> getCoursesOfAUser() throws CustomException {
-        UserDescription userDescription = getUserDescription(currentUser.getCurrentUserId());
+    public Set<CourseResponse> getCoursesOfAUser() throws CustomException {
+        UserDescription userDescription = getUserDescription();
 
-        if(userDescription.getRole().equals(Role.STUDENT))return userDescription.getCourses();
+        if(userDescription.getRole().equals(Role.STUDENT))
+            userDescription.getCourses()
+                    .stream()
+                    .map(course -> {
+                        CourseResponse courseResponse
+                                = new CourseResponse();
+                        BeanUtils.copyProperties(course,courseResponse);
+                        return courseResponse;
+                    })
+                    .collect(Collectors.toSet());
 
         return courseService.getAllCourseOfATeacher(currentUser.getCurrentUserId());
     }

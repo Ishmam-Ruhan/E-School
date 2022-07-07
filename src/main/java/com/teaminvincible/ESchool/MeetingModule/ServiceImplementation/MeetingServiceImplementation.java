@@ -1,7 +1,9 @@
 package com.teaminvincible.ESchool.MeetingModule.ServiceImplementation;
 
 import com.teaminvincible.ESchool.Configurations.Master.CurrentUser;
+import com.teaminvincible.ESchool.CourseModule.DTO.CourseResponse;
 import com.teaminvincible.ESchool.CourseModule.Entity.Course;
+import com.teaminvincible.ESchool.CourseModule.Service.CourseService;
 import com.teaminvincible.ESchool.Enums.Role;
 import com.teaminvincible.ESchool.ExceptionManagement.CustomException;
 import com.teaminvincible.ESchool.MeetingModule.DTO.CreateMeetingRequest;
@@ -31,6 +33,8 @@ public class MeetingServiceImplementation implements MeetingService {
     @Autowired
     private UserDescriptionService userDescriptionService;
 
+    @Autowired
+    private CourseService courseService;
 
     @Autowired
     private CurrentUser currentUser;
@@ -50,12 +54,12 @@ public class MeetingServiceImplementation implements MeetingService {
     @Override
     public Meeting createMeeting(String courseId, CreateMeetingRequest createMeetingRequest) throws CustomException {
 
-        UserDescription userDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription userDescription = userDescriptionService.getUserDescription();
 
         if(userDescription.getRole() == Role.STUDENT)
             throw new CustomException(HttpStatus.BAD_REQUEST,"Students are not allowed to create a meeting! They can only participate.");
 
-        Optional<Course> targetCourse = userDescriptionService.getCoursesOfAUser().stream()
+        Optional<CourseResponse> targetCourse = userDescriptionService.getCoursesOfAUser().stream()
                 .filter(course -> course.getCourseId().equals(courseId))
                 .findFirst();
 
@@ -70,7 +74,7 @@ public class MeetingServiceImplementation implements MeetingService {
             meeting.setStartTime(createMeetingRequest.getStartTime());
             meeting.setEndTime(createMeetingRequest.getEndTime());
 
-            meeting.setCourse(targetCourse.get());
+            meeting.setCourse(courseService.getCourseDetails(courseId));
             meeting.setCreatedBy(userDescription);
 
         try{
@@ -79,7 +83,7 @@ public class MeetingServiceImplementation implements MeetingService {
             throw new CustomException(HttpStatus.BAD_REQUEST,"Can't process the request right now! Please try again.");
         }
 
-        userDescriptionService.saveMeetingToUsers(targetCourse.get().getStudents(), meeting);
+        userDescriptionService.saveMeetingToUsers(courseService.getCourseDetails(courseId).getStudents(), meeting);
 
         return meeting;
     }
@@ -116,7 +120,7 @@ public class MeetingServiceImplementation implements MeetingService {
 
         Meeting meetingToRemove = findMeetingById(meetingId);
 
-        UserDescription currentUserDescription = userDescriptionService.getUserDescription(currentUser.getCurrentUserId());
+        UserDescription currentUserDescription = userDescriptionService.getUserDescription();
 
         if(!meetingToRemove.getCreatedBy().getUserId().equals(currentUserDescription.getUserId()))
             throw new CustomException(HttpStatus.BAD_REQUEST,"Sorry! You're not the creator of the meeting.");

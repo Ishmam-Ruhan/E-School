@@ -96,6 +96,21 @@ public class CourseController {
     }
 
     @Operation(
+            summary = "Get course details"
+    )
+    @GetAPI("/get-details")
+    public ResponseEntity getCourseDetails(@RequestParam String courseId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new Response<>(
+                        HttpStatus.OK,
+                        true,
+                        "Fetched course details success!",
+                        courseService.getCourseDetails(courseId)
+                ));
+    }
+
+
+    @Operation(
             summary = "Get all tasks of a enrolled course."
     )
     @GetAPI("/get-tasks")

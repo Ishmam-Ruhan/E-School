@@ -47,7 +47,7 @@ public class UserDescriptionController {
                         HttpStatus.OK,
                         true,
                         "Successfully fetched user description",
-                        userDescriptionService.getUserDescription(currentUser.getCurrentUserId())
+                        userDescriptionService.getMinimalUserDescription()
                 ));
     }
 
